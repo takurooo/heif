@@ -1,8 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from common import futils
-from common.basebox import Box, FullBox
+from utils.box.basebox import Box
 
 
 # -----------------------------------
@@ -25,9 +24,12 @@ class MediaDataBox(Box):
     Quantity:   Zero	or	more
     """
 
-    def __init__(self, f):
-        super(MediaDataBox, self).__init__(f)
-        self.skip_to_end(f)
+    def __init__(self):
+        super(MediaDataBox, self).__init__()
+
+    def parse(self, reader):
+        super(MediaDataBox, self).parse(reader)
+        self.to_box_end(reader)
 
     def print_box(self):
         super(MediaDataBox, self).print_box()

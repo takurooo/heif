@@ -1,8 +1,8 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from common import futils
-from common.basebox import Box, FullBox
+from utils.box.basebox import Box
+
 
 # -----------------------------------
 # define
@@ -24,19 +24,23 @@ class FileTypeBox(Box):
     Quantity: Exactly one
     """
 
-    def __init__(self, f):
-        super(FileTypeBox, self).__init__(f)
-        self.parse(f)
-        assert self.remain_size(f) == 0, '{} remainsize {} not 0.'.format(self.type, self.remain_size(f))
+    def __init__(self):
+        super(FileTypeBox, self).__init__()
+        self.major_brand = None
+        self.minor_version = None
+        self.compatible_brands = None
 
-    def parse(self, f):
-        self.major_brand = futils.read32(f, 'big', decode=True)
-
-        self.minor_version = futils.read32(f, 'big', decode=True)
+    def parse(self, reader):
+        super(FileTypeBox, self).parse(reader)
+        self.major_brand = reader.read32('big', decode=False)
+        self.minor_version = reader.read32('big', decode=False)
 
         self.compatible_brands = []
-        for _ in range(self.remain_size(f) // 4):
-            self.compatible_brands.append(futils.read32(f, 'big', decode=True))
+
+        while not self.read_box_done(reader):
+            self.compatible_brands.append(reader.read32('big', decode=True))
+
+        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(FileTypeBox, self).print_box()

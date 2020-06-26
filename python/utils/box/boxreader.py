@@ -3,17 +3,18 @@
 # -----------------------------------
 import os
 from collections import OrderedDict
+from utils.file.binaryfilereader import BinaryFileReader
 
-from common.basebox import Box, FullBox
-from common.ftypebox import FileTypeBox
-from common.metabox import MetaBox
-from common.hdlrbox import HandlerReferenceBox
-from common.ilocbox import ItemLocationBox
-from common.iinfbox import ItemInformationBox
-from common.pitmbox import PrimaryItemBox
-from common.mdatbox import MediaDataBox
-from common.iprpbox import ItemPropertiesBox
-from common.irefbox import ItemReferenceBox
+from utils.box.basebox import Box
+from utils.box.ftypebox import FileTypeBox
+from utils.box.metabox import MetaBox
+from utils.box.hdlrbox import HandlerReferenceBox
+from utils.box.ilocbox import ItemLocationBox
+from utils.box.iinfbox import ItemInformationBox
+from utils.box.pitmbox import PrimaryItemBox
+from utils.box.mdatbox import MediaDataBox
+from utils.box.iprpbox import ItemPropertiesBox
+from utils.box.irefbox import ItemReferenceBox
 
 # -----------------------------------
 # define
@@ -76,26 +77,27 @@ class BoxReader:
 
     def __init__(self, path):
         self.file_size = os.path.getsize(path)
-        self.f = open(path, 'rb')
+        self.reader = BinaryFileReader(path)
         self.box_pos = OrderedDict()
         self.boxinfo_deployer = BoxInfoDeployer()
 
     def __del__(self):
-        self.f.close()
+        pass
 
     def read_boxes(self):
-        self.f.seek(0)
+        self.reader.seek(0)
 
         total_file_size = self.file_size
         while 0 < total_file_size:
-            boxsize = self._read_box(self.f)
+            boxsize = self._read_box(self.reader)
             total_file_size -= boxsize
 
         return tuple(self.box_pos.keys())
 
-    def _read_box(self, f):
-        box = Box(f)
-        self.box_pos[box.type] = {'size':box.size, 'fp':box.start_fp}
+    def _read_box(self, reader):
+        box = Box()
+        box.parse(reader)
+        self.box_pos[box.type] = {'size':box.get_box_size(), 'fp':box.get_box_start_pos()}
         data_size = box.size - BOX_HEADER_SIZE
 
         if self._has_child(box.type):
@@ -104,15 +106,15 @@ class BoxReader:
             if self._is_fullbox(box.type):
                 # FullBox: unsigned int(8) version; bit(24) flags;
                 fullbox_info_size = 4
-                f.seek(fullbox_info_size, 1)  # f.seek(offset, whence)
+                reader.seek(fullbox_info_size, 1)  # f.seek(offset, whence)
                 children_size -= fullbox_info_size
 
             while 0 < children_size:
-                child_size = self._read_box(f)
+                child_size = self._read_box(reader)
                 children_size -= child_size
 
         else:
-            f.seek(data_size, 1)
+            reader.seek(data_size, 1)
 
         return box.size
 
@@ -131,10 +133,16 @@ class BoxReader:
         if target_box_pos is None:
             return None
 
-        target_box_class = self._get_box_class(boxtype)
-        if target_box_class is not None:
-            self.f.seek(target_box_pos['fp'])
-            box = target_box_class(self.f)
+        target_box = self._get_box_class(boxtype)
+        if target_box is not None:
+            self.reader.seek(target_box_pos['fp'])
+            try:
+                box = target_box()
+                box.parse(self.reader)
+            except:
+                import traceback
+                traceback.print_exc()
+                assert 0, ""
             return box
         else:
             return None

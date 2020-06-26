@@ -1,8 +1,8 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from common import futils
-from common.basebox import Box, FullBox
+from utils.box.basebox import Box, FullBox
+from utils.box import boxutils
 
 
 # -----------------------------------
@@ -19,19 +19,20 @@ from common.basebox import Box, FullBox
 
 
 class SingleItemTypeReferenceBox(Box):
-    def __init__(self, f):
-        super(SingleItemTypeReferenceBox, self).__init__(f)
+    def __init__(self):
+        super(SingleItemTypeReferenceBox, self).__init__()
         self.from_item_ID = None
         self.reference_count = None
         self.to_item_ID = None
-        self.parse(f)
 
-    def parse(self, f):
-        self.from_item_ID = futils.read16(f, 'big')
-        self.reference_count = futils.read16(f, 'big')
+    def parse(self, reader):
+        super(SingleItemTypeReferenceBox, self).parse(reader)
+
+        self.from_item_ID = reader.read16('big')
+        self.reference_count = reader.read16('big')
         self.to_item_ID = []
         for _ in range(self.reference_count):
-            self.to_item_ID.append(futils.read16(f, 'big'))
+            self.to_item_ID.append(reader.read16('big'))
 
     def print_box(self):
         super(SingleItemTypeReferenceBox, self).print_box()
@@ -41,19 +42,20 @@ class SingleItemTypeReferenceBox(Box):
 
 
 class SingleItemTypeReferenceBoxLarge(Box):
-    def __init__(self, f):
-        super(SingleItemTypeReferenceBoxLarge, self).__init__(f)
+    def __init__(self):
+        super(SingleItemTypeReferenceBoxLarge, self).__init__()
         self.from_item_ID = None
         self.reference_count = None
         self.to_item_ID = None
-        self.parse(f)
 
-    def parse(self, f):
-        self.from_item_ID = futils.read32(f, 'big')
-        self.reference_count = futils.read16(f, 'big')
+    def parse(self, reader):
+        super(SingleItemTypeReferenceBoxLarge, self).parse(reader)
+
+        self.from_item_ID = reader.read32('big')
+        self.reference_count = reader.read16('big')
         self.to_item_ID = []
         for _ in range(self.reference_count):
-            self.to_item_ID.append(futils.read32(f, 'big'))
+            self.to_item_ID.append(reader.read32('big'))
 
     def print_box(self):
         super(SingleItemTypeReferenceBoxLarge, self).print_box()
@@ -71,23 +73,30 @@ class ItemReferenceBox(FullBox):
     Quantity:   Zero	or	one
     """
 
-    def __init__(self, f):
-        super(ItemReferenceBox, self).__init__(f)
-        self.references = None
-        self.parse(f)
+    def __init__(self):
+        super(ItemReferenceBox, self).__init__()
+        self.item_reference_list = None
 
-    def parse(self, f):
-        self.references = []
-        while 0 < self.remain_size(f):
-            if self.version == 0:
-                self.references.append(SingleItemTypeReferenceBox(f))
-            else:
-                self.references.append(SingleItemTypeReferenceBoxLarge(f))
+    def parse(self, reader):
+        super(ItemReferenceBox, self).parse(reader)
+
+        self.item_reference_list = []
+        if self.version == 0:
+            item_ref_box_class = SingleItemTypeReferenceBox
+        else:
+            item_ref_box_class = SingleItemTypeReferenceBoxLarge
+
+        while not self.read_box_done(reader):
+            box_size, box_type = boxutils.read_box_header(reader)
+
+            item_ref_box = item_ref_box_class()
+            item_ref_box.parse(reader)
+            self.item_reference_list.append(item_ref_box)
 
     def print_box(self):
         super(ItemReferenceBox, self).print_box()
-        for reference in self.references:
-            reference.print_box()
+        for item_reference in self.item_reference_list:
+            item_reference.print_box()
 
 
 # -----------------------------------

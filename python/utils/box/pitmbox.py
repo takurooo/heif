@@ -1,8 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from common import futils
-from common.basebox import Box, FullBox
+from utils.box.basebox import FullBox
 
 # -----------------------------------
 # define
@@ -15,6 +14,8 @@ from common.basebox import Box, FullBox
 # -----------------------------------
 # class
 # -----------------------------------
+
+
 class PrimaryItemBox(FullBox):
     """
     Box Type: ‘pitm’
@@ -23,14 +24,18 @@ class PrimaryItemBox(FullBox):
     Quantity: Zero or one
     """
 
-    def __init__(self, f):
-        super(PrimaryItemBox, self).__init__(f)
+    def __init__(self):
+        super(PrimaryItemBox, self).__init__()
         self.item_ID = None
-        self.parse(f)
-        assert self.remain_size(f) == 0, '{} remainsize {} not 0.'.format(self.type, self.remain_size(f))
 
-    def parse(self, f):
-        self.item_ID = futils.read16(f, 'big')
+    def parse(self, reader):
+        super(PrimaryItemBox, self).parse(reader)
+
+        self.item_ID = reader.read16('big')
+        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+
+    def get_primary_item_id(self):
+        return self.item_ID
 
     def print_box(self):
         super(PrimaryItemBox, self).print_box()

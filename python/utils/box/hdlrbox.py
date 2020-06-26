@@ -1,8 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from common import futils
-from common.basebox import Box, FullBox
+from utils.box.basebox import FullBox
 
 # -----------------------------------
 # define
@@ -15,6 +14,8 @@ from common.basebox import Box, FullBox
 # -----------------------------------
 # class
 # -----------------------------------
+
+
 class HandlerReferenceBox(FullBox):
     """
     ISO/IEC 14496-12
@@ -24,26 +25,32 @@ class HandlerReferenceBox(FullBox):
     Quantity: Exactly one
     """
 
-    def __init__(self, f):
-        super(HandlerReferenceBox, self).__init__(f)
+    def __init__(self):
+        super(HandlerReferenceBox, self).__init__()
         self.pre_defined = None
         self.handler_type = None
         self.name = None
-        self.parse(f)
-        assert self.remain_size(f) == 0, '{} remainsize {} not 0.'.format(self.type, self.remain_size(f))
 
-    def parse(self, f):
-        self.pre_defined = futils.read32(f, 'big')
-        self.handler_type = futils.read32(f, 'big', decode=True)
+    def parse(self, reader):
+        super(HandlerReferenceBox, self).parse(reader)
+
+        self.pre_defined = reader.read32()
+        self.handler_type = reader.read32(decode=True)
         for _ in range(3):
-            _ = futils.read32(f, 'big')  # reserved
-        self.name = futils.read_null_terminated(f)
+            _ = reader.read32()  # reserved
+
+        self.name = None
+        if not self.read_box_done(reader):
+            self.name = reader.read_null_terminated()
+            pass
+
+        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(HandlerReferenceBox, self).print_box()
-        print("pre_defined :", self.pre_defined)
+        print("pre_defined  :", self.pre_defined)
         print("handler_type :", self.handler_type)
-        print("name :", self.name)
+        print("name         :", self.name)
 
 # -----------------------------------
 # main
