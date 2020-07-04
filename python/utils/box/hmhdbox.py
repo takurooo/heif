@@ -1,9 +1,8 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
-from utils.box import boxutils
+
 
 # -----------------------------------
 # define
@@ -43,7 +42,7 @@ class HintMediaHeaderBox(FullBox):
         self.avgbitrate = reader.read16()
         _ = reader.read32()  # reserved = 0
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(HintMediaHeaderBox, self).print_box()
@@ -51,6 +50,7 @@ class HintMediaHeaderBox(FullBox):
         print("avgPDUsize :", self.avgPDUsize)
         print("maxbitrate :", self.maxbitrate)
         print("avgbitrate :", self.avgbitrate)
+
 
 # -----------------------------------
 # main

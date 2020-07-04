@@ -1,14 +1,12 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from collections import OrderedDict
 
+from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.mvhdbox import MovieHeaderBox
 from utils.box.trackbox import TrackBox
-from utils.box.edtsbox import EditBox
 
-from utils.box import boxutils
 
 # -----------------------------------
 # define
@@ -37,7 +35,7 @@ class MovieBox(Box):
 
     def parse(self, reader):
         super(MovieBox, self).parse(reader)
-        while not self.read_box_done(reader):
+        while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
             if box_type == 'mvhd':
                 self.mvhd = MovieHeaderBox()

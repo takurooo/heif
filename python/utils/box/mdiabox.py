@@ -1,12 +1,12 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from utils.box import boxutils
 from utils.box.basebox import Box
-from utils.box.basebox import FullBox
+from utils.box.hdlrbox import HandlerReferenceBox
 from utils.box.mdhdbox import MediaHeaderBox
 from utils.box.minfbox import MediaInformationBox
-from utils.box.hdlrbox import HandlerReferenceBox
-from utils.box import boxutils
+
 
 # -----------------------------------
 # define
@@ -39,7 +39,7 @@ class MediaBox(Box):
     def parse(self, reader):
         super(MediaBox, self).parse(reader)
 
-        while not self.read_box_done(reader):
+        while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
             if box_type == 'mdhd':
                 self.mdhd = MediaHeaderBox()
@@ -53,7 +53,7 @@ class MediaBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(MediaBox, self).print_box()

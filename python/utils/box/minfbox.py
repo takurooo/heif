@@ -1,13 +1,13 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
-from utils.box.basebox import FullBox
-from utils.box.vmhdbox import VideoMediaHeaderBox
-from utils.box.smhdbox import SoundMediaHeaderBox
-from utils.box.hmhdbox import HintMediaHeaderBox
-from utils.box.stblbox import SampleTableBox
 from utils.box import boxutils
+from utils.box.basebox import Box
+from utils.box.hmhdbox import HintMediaHeaderBox
+from utils.box.smhdbox import SoundMediaHeaderBox
+from utils.box.stblbox import SampleTableBox
+from utils.box.vmhdbox import VideoMediaHeaderBox
+
 
 # -----------------------------------
 # define
@@ -45,7 +45,7 @@ class MediaInformationBox(Box):
     def parse(self, reader):
         super(MediaInformationBox, self).parse(reader)
 
-        while not self.read_box_done(reader):
+        while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
 
             if box_type == 'vmhd':
@@ -71,7 +71,7 @@ class MediaInformationBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(MediaInformationBox, self).print_box()
@@ -83,6 +83,7 @@ class MediaInformationBox(Box):
             self.hmhd.print_box()
         if self.stbl is not None:
             self.stbl.print_box()
+
 
 # -----------------------------------
 # main

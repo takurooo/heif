@@ -1,13 +1,11 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from utils.box import boxutils
 from utils.box.basebox import Box
-from utils.box.basebox import FullBox
-from utils.box.tkhdbox import TrackHeaderBox
 from utils.box.edtsbox import EditBox
 from utils.box.mdiabox import MediaBox
-
-from utils.box import boxutils
+from utils.box.tkhdbox import TrackHeaderBox
 
 
 # -----------------------------------
@@ -40,7 +38,7 @@ class TrackBox(Box):
     def parse(self, reader):
         super(TrackBox, self).parse(reader)
 
-        while not self.read_box_done(reader):
+        while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
 
             if box_type == 'tkhd':
@@ -63,6 +61,7 @@ class TrackBox(Box):
             self.edts.print_box()
         if self.mdia is not None:
             self.mdia.print_box()
+
 
 # -----------------------------------
 # main

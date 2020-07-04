@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -24,6 +23,7 @@ class EditListEntry:
         self.media_rate_integer = None
         self.media_rate_fraction = None
 
+
 class EditListBox(FullBox):
     """
     ISO/IEC 14496-12
@@ -38,7 +38,6 @@ class EditListBox(FullBox):
         self.entry_count = None
         self.entries = None
 
-
     def parse(self, reader):
         super(EditListBox, self).parse(reader)
 
@@ -46,7 +45,7 @@ class EditListBox(FullBox):
         self.entries = []
         for _ in range(self.entry_count):
             elst_entry = EditListEntry()
-            if self.version == 1:
+            if self.get_version() == 1:
                 elst_entry.segment_duration = reader.read64()
                 elst_entry.media_time = reader.read64()
             else:
@@ -58,7 +57,7 @@ class EditListBox(FullBox):
 
             self.entries.append(elst_entry)
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(EditListBox, self).print_box()

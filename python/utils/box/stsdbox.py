@@ -1,14 +1,10 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.basebox import FullBox
-from utils.box.sttsbox import DecodingTimeToSampleBox
-from utils.box.cttsbox import CompositionTimeToSample
-from utils.box.stscbox import SampleToChunkBox
-from utils.box.stszbox import SampleSizeBox
-from utils.box.stcobox import ChunkOffsetBox
-from utils.box import boxutils
+
 
 # -----------------------------------
 # define
@@ -92,7 +88,7 @@ class SampleDescriptionBox(FullBox):
             box_size, box_type = boxutils.read_box_header(reader)
             # print(box_type)
             if box_type == 'avc1':  # Advanced Video Coding
-                reader.seek(box_size, 1) # TODO avc1
+                reader.seek(box_size, 1)  # TODO avc1
             elif box_type == 'twos':  # Uncompressed 16-bit audio
                 self.twos = AudioSampleEntry()
                 self.twos.parse(reader)
@@ -104,7 +100,7 @@ class SampleDescriptionBox(FullBox):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(SampleDescriptionBox, self).print_box()

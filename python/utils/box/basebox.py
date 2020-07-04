@@ -27,27 +27,6 @@ class Box:
         self.largesize = None
         self.usertype = None
 
-    # def write_box_header(self, writer):
-    #     self.start_pos = writer.tell()
-    #
-    #     writer.write32(self.size)
-    #     writer.write32(self.type, encode=True)
-    #
-    #     if self.size == 1:
-    #         assert 0, 'not support'
-    #         # writer.write64(self.largesize)
-    #
-    #     if self.type == 'uuid':
-    #         assert 0, 'not support'
-    #         # for usertype in self.usertype:
-    #         #     writer.write8(usertype)
-    #
-    # def set_box_size(self, size):
-    #     self.size = size
-    #
-    # def set_box_type(self, type):
-    #     self.type = type
-
     def parse(self, reader):
         self.start_pos = reader.tell()
         # size is an integer that specifies the number of bytes in this box,
@@ -55,50 +34,52 @@ class Box:
         # if size is 1 then the actual size is in the field large size;
         # if size is 0, then this box is the last one in the file,
         # and its contents extend to the end of the file (normally only used for a Media Data Box)
-        self.size = reader.read32('big')
+        self.size = reader.read32()
         # type identifies the box type;
         # standard boxes use a compact type, which is normally four printable characters,
         # to permit ease of identification, and is shown so in the boxes below.
         # User extensions use an extended type; in this case, the type field is set to ‘uuid’.
-        self.type = reader.read32('big', decode=True)
+        self.type = reader.read32(decode=True)
 
         if self.size == 1:
-            self.largesize = reader.read64('big')
+            self.largesize = reader.read64()
         elif self.size == 0:
             # box extends to end of file
             pass
         if self.type == 'uuid':
-            self.usertype = [reader.read8('big') for _ in range(16)]
+            self.usertype = [reader.read8() for _ in range(16)]
 
-    def print_box(self):
-        print('--------------------------')
-        print('boxtype   :', self.type)
-        print('boxsize   :', hex(self.size))
-        print('largesize :', self.largesize)
-        print('usertype  :', self.usertype)
-        print('--------------------------')
-
-    def get_box_size(self):
+    def get_size(self):
         if self.size == 1:
             return self.largesize
         else:
             return self.size
 
-    def get_box_type(self):
+    def get_type(self):
         return self.type
 
-    def get_box_start_pos(self):
+    def get_start_pos(self):
         return self.start_pos
 
-    def read_box_done(self, reader):
-        read_size = reader.tell() - self.get_box_start_pos()
-        if self.get_box_size() <= read_size:
+    def read_complete(self, reader):
+        read_size = reader.tell() - self.start_pos
+        if self.get_size() <= read_size:
             return True
         else:
             return False
 
     def to_box_end(self, reader):
-        reader.seek(self.get_box_start_pos()+self.get_box_size())
+        reader.seek(self.start_pos + self.get_size())
+
+    def print_box(self):
+        print()
+        print('--------------------------')
+        print(' boxtype   :', self.type)
+        print(' boxsize   :', hex(self.size))
+        print(' largesize :', self.largesize)
+        print(' usertype  :', self.usertype)
+        print(' filepos   :', hex(self.start_pos))
+        print('--------------------------')
 
 
 class FullBox(Box):
@@ -108,11 +89,6 @@ class FullBox(Box):
         self.version = None
         self.flags = None
 
-    # def write_full_box_header(self, writer):
-    #     self.write_box_header(writer)
-    #     writer.write8(self.version)
-    #     writer.write24(self.flags)
-
     def parse(self, reader):
         super(FullBox, self).parse(reader)
         # v_flags = bitstream.read32('big')
@@ -121,6 +97,11 @@ class FullBox(Box):
         self.version = reader.readbits(8)
         self.flags = reader.readbits(24)
 
+    def get_version(self):
+        return self.version
+
+    def get_flags(self):
+        return self.flags
 
     def print_box(self):
         super(FullBox, self).print_box()

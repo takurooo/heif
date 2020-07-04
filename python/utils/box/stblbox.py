@@ -1,15 +1,15 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
-from utils.box.basebox import FullBox
-from utils.box.stsdbox import SampleDescriptionBox
-from utils.box.sttsbox import DecodingTimeToSampleBox
-from utils.box.cttsbox import CompositionTimeToSample
-from utils.box.stscbox import SampleToChunkBox
-from utils.box.stszbox import SampleSizeBox
-from utils.box.stcobox import ChunkOffsetBox
 from utils.box import boxutils
+from utils.box.basebox import Box
+from utils.box.cttsbox import CompositionTimeToSample
+from utils.box.stcobox import ChunkOffsetBox
+from utils.box.stscbox import SampleToChunkBox
+from utils.box.stsdbox import SampleDescriptionBox
+from utils.box.stszbox import SampleSizeBox
+from utils.box.sttsbox import DecodingTimeToSampleBox
+
 
 # -----------------------------------
 # define
@@ -45,7 +45,7 @@ class SampleTableBox(Box):
     def parse(self, reader):
         super(SampleTableBox, self).parse(reader)
 
-        while not self.read_box_done(reader):
+        while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
             # print(f" {box_type}")
             if box_type == 'stsd':
@@ -69,7 +69,7 @@ class SampleTableBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(SampleTableBox, self).print_box()

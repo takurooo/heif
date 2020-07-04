@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -40,14 +39,14 @@ class DecodingTimeToSampleBox(FullBox):
             self.sample_count.append(reader.read32())
             self.sample_delta.append(reader.read32())
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
-
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(DecodingTimeToSampleBox, self).print_box()
         print("entry_count   :", self.entry_count)
         print("sample_count  :", self.sample_count)
         print("sample_delta  :", self.sample_delta)
+
 
 # -----------------------------------
 # main

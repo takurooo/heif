@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-import os
 import struct
 
 # -----------------------------------
@@ -15,11 +14,15 @@ BIG_LITTLE = {'little':'<', 'big':'>'}
 # -----------------------------------
 
 
-class BinaryFileReader:
+class BinaryFileWriter:
 
     def __init__(self, file_path):
         self.file_path = file_path
         self.f = open(file_path, 'wb')
+        self.byteorder = 'big'
+
+    def set_byteorder(self, byteorder):
+        self.byteorder = byteorder
 
     def close(self):
         if self.f:
@@ -31,24 +34,24 @@ class BinaryFileReader:
     def tell(self):
         return self.f.tell()
 
-    def write8(self, v, order='big', encode=False):
+    def write8(self, v, encode=False):
         if encode:
             self.f.write(v.encode('utf-8'))
         else:
-            self.f.write(struct.pack(BIG_LITTLE[order] + 'B', v))
+            self.f.write(struct.pack(BIG_LITTLE[self.byteorder] + 'B', v))
 
-    def write16(self, v, order='big', encode=False):
+    def write16(self, v, encode=False):
         if encode:
             self.f.write(v.encode('utf-8'))
         else:
-            self.f.write(struct.pack(BIG_LITTLE[order] + 'H', v))
+            self.f.write(struct.pack(BIG_LITTLE[self.byteorder] + 'H', v))
 
-    def write24(self, v, order='big', encode=False):
+    def write24(self, v, encode=False):
         if encode:
             self.f.write(v.encode('utf-8'))
         else:
             b = []
-            if order == 'big':
+            if self.byteorder == 'big':
                 c = (v >> 16) & 0xff
                 self.write8(c)
                 c = (v >> 8) & 0xff
@@ -63,17 +66,17 @@ class BinaryFileReader:
                 c = (v >> 16) & 0xff
                 self.write8(c)
 
-    def write32(self, v, order='big', encode=False):
+    def write32(self, v, encode=False):
         if encode:
             self.f.write(v.encode('utf-8'))
         else:
-            self.f.write(struct.pack(BIG_LITTLE[order] + 'L', v))
+            self.f.write(struct.pack(BIG_LITTLE[self.byteorder] + 'L', v))
 
-    def write64(self, v, order='big', encode=False):
+    def write64(self, v, encode=False):
         if encode:
             self.f.write(v.encode('utf-8'))
         else:
-            self.f.write(struct.pack(BIG_LITTLE[order] + 'Q', v))
+            self.f.write(struct.pack(BIG_LITTLE[self.byteorder] + 'Q', v))
 
 # -----------------------------------
 # main

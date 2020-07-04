@@ -3,6 +3,7 @@
 # -----------------------------------
 from utils.box.basebox import FullBox
 
+
 # -----------------------------------
 # define
 # -----------------------------------
@@ -40,17 +41,18 @@ class HandlerReferenceBox(FullBox):
             _ = reader.read32()  # reserved
 
         self.name = None
-        if not self.read_box_done(reader):
+        if not self.read_complete(reader):
             self.name = reader.read_null_terminated()
             pass
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(HandlerReferenceBox, self).print_box()
         print("pre_defined  :", self.pre_defined)
         print("handler_type :", self.handler_type)
         print("name         :", self.name)
+
 
 # -----------------------------------
 # main

@@ -3,6 +3,7 @@
 # -----------------------------------
 from utils.box.basebox import FullBox
 
+
 # -----------------------------------
 # define
 # -----------------------------------
@@ -41,7 +42,7 @@ class TrackHeaderBox(FullBox):
     def parse(self, reader):
         super(TrackHeaderBox, self).parse(reader)
 
-        if self.version == 1:
+        if self.get_version() == 1:
             self.creation_time = reader.read64()
             self.modification_time = reader.read64()
             self.track_ID = reader.read32()
@@ -70,7 +71,7 @@ class TrackHeaderBox(FullBox):
         self.width = reader.read32()
         self.height = reader.read32()
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(TrackHeaderBox, self).print_box()
@@ -84,6 +85,7 @@ class TrackHeaderBox(FullBox):
         print("matrix            :", self.matrix)
         print("width             :", self.width >> 16)
         print("height            :", self.height >> 16)
+
 
 # -----------------------------------
 # main

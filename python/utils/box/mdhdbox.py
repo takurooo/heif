@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -38,7 +37,7 @@ class MediaHeaderBox(FullBox):
     def parse(self, reader):
         super(MediaHeaderBox, self).parse(reader)
 
-        if self.version == 1:
+        if self.get_version() == 1:
             self.creation_time = reader.read64()
             self.modification_time = reader.read64()
             self.timescale = reader.read32()
@@ -54,8 +53,7 @@ class MediaHeaderBox(FullBox):
             self.language.append(reader.readbits(5))
         self.pre_defined = reader.read16()
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
-
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(MediaHeaderBox, self).print_box()
@@ -66,6 +64,7 @@ class MediaHeaderBox(FullBox):
         print("pad               :", self.pad)
         print("language          :", self.language)
         print("pre_defined       :", self.pre_defined)
+
 
 # -----------------------------------
 # main

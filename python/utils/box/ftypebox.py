@@ -32,20 +32,20 @@ class FileTypeBox(Box):
 
     def parse(self, reader):
         super(FileTypeBox, self).parse(reader)
-        self.major_brand = reader.read32('big', decode=False)
-        self.minor_version = reader.read32('big', decode=False)
+        self.major_brand = reader.read32(decode=True)
+        self.minor_version = reader.read32(decode=False)
 
         self.compatible_brands = []
 
-        while not self.read_box_done(reader):
-            self.compatible_brands.append(reader.read32('big', decode=True))
+        while not self.read_complete(reader):
+            self.compatible_brands.append(reader.read32(decode=True))
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(FileTypeBox, self).print_box()
-        print("major_brand :", self.major_brand)
-        print("minor_version :", self.minor_version)
+        print("major_brand       :", self.major_brand)
+        print("minor_version     :", self.minor_version)
         print("compatible_brands :", self.compatible_brands)
 
 

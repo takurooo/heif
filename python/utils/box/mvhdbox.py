@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -40,7 +39,7 @@ class MovieHeaderBox(FullBox):
     def parse(self, reader):
         super(MovieHeaderBox, self).parse(reader)
 
-        if self.version == 1:
+        if self.get_version() == 1:
             self.creation_time = reader.read64()
             self.modification_time = reader.read64()
             self.timescale = reader.read32()
@@ -68,8 +67,7 @@ class MovieHeaderBox(FullBox):
 
         self.next_track_ID = reader.read32()
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
-
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(MovieHeaderBox, self).print_box()
@@ -82,6 +80,7 @@ class MovieHeaderBox(FullBox):
         print("matrix :", self.matrix)
         print("predefined :", self.predefined)
         print("next_track_ID :", self.next_track_ID)
+
 
 # -----------------------------------
 # main

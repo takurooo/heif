@@ -34,19 +34,19 @@ class ColourInformationBox(Box):
     def parse(self, reader):
         super(ColourInformationBox, self).parse(reader)
 
-        self.colour_type = reader.read32('big', decode=True)
+        self.colour_type = reader.read32(decode=True)
         if self.colour_type == 'nclx':
-            self.colour_primaries = reader.read16('big')
-            self.transfer_characteristics = reader.read16('big')
-            self.matrix_coefficients = reader.read16('big')
-            tmp = reader.read8('big')
+            self.colour_primaries = reader.read16()
+            self.transfer_characteristics = reader.read16()
+            self.matrix_coefficients = reader.read16()
+            tmp = reader.read8()
             self.full_range_flag = (tmp & 0x80) >> 7
         elif self.colour_type == 'rICC':
             assert 0, 'not support {}'.format(self.colour_type)  # TODO
         elif self.colour_type == 'prof':
             assert 0, 'not support {}'.format(self.colour_type)  # TODO
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(ColourInformationBox, self).print_box()
@@ -55,6 +55,7 @@ class ColourInformationBox(Box):
         print("transfer_characteristics :", self.transfer_characteristics)
         print("matrix_coefficients :", self.matrix_coefficients)
         print("full_range_flag :", self.full_range_flag)
+
 
 # -----------------------------------
 # main

@@ -1,16 +1,15 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from collections import OrderedDict
 
+from utils.box import boxutils
 from utils.box.basebox import FullBox
 from utils.box.hdlrbox import HandlerReferenceBox
-from utils.box.ilocbox import ItemLocationBox
 from utils.box.iinfbox import ItemInformationBox
-from utils.box.pitmbox import PrimaryItemBox
+from utils.box.ilocbox import ItemLocationBox
 from utils.box.iprpbox import ItemPropertiesBox
 from utils.box.irefbox import ItemReferenceBox
-from utils.box import boxutils
+from utils.box.pitmbox import PrimaryItemBox
 
 
 # -----------------------------------
@@ -47,7 +46,7 @@ class MetaBox(FullBox):
     def parse(self, reader):
         super(MetaBox, self).parse(reader)
 
-        while not self.read_box_done(reader):
+        while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
             # print(box_type)
             if box_type == 'hdlr':
@@ -71,7 +70,6 @@ class MetaBox(FullBox):
             else:
                 reader.seek(box_size, 1)
 
-
     def print_box(self):
         super(MetaBox, self).print_box()
 
@@ -87,8 +85,6 @@ class MetaBox(FullBox):
             self.iref.print_box()
         if self.iloc is not None:
             self.iloc.print_box()
-
-
 
 
 # -----------------------------------

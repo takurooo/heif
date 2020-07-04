@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -42,7 +41,7 @@ class SampleToChunkBox(FullBox):
             self.samples_per_chunk.append(reader.read32())
             self.sample_description_index.append(reader.read32())
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(SampleToChunkBox, self).print_box()
@@ -61,6 +60,8 @@ class SampleToChunkBox(FullBox):
             samples_per_chunk = self.samples_per_chunk[-1]
 
         return samples_per_chunk
+
+
 # -----------------------------------
 # main
 # -----------------------------------

@@ -1,7 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import FullBox
+from utils.box.item_property import ItemFullProperty
 
 
 # -----------------------------------
@@ -15,32 +15,28 @@ from utils.box.basebox import FullBox
 # -----------------------------------
 # class
 # -----------------------------------
-
-
-class PrimaryItemBox(FullBox):
+class ImageSpatialExtentsProperty(ItemFullProperty):
     """
-    Box Type: ‘pitm’
-    Container: Meta box (‘meta’)
-    Mandatory: No
-    Quantity: Zero or one
+    ISO/IEC 23008-12
+    Box Type: ‘ispe’
     """
 
     def __init__(self):
-        super(PrimaryItemBox, self).__init__()
-        self.item_ID = None
+        super(ImageSpatialExtentsProperty, self).__init__()
+        self.image_width = None
+        self.image_height = None
 
     def parse(self, reader):
-        super(PrimaryItemBox, self).parse(reader)
+        super(ImageSpatialExtentsProperty, self).parse(reader)
 
-        self.item_ID = reader.read16()
+        self.image_width = reader.read32()
+        self.image_height = reader.read32()
         assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_primary_item_id(self):
-        return self.item_ID
-
     def print_box(self):
-        super(PrimaryItemBox, self).print_box()
-        print('item_ID :', self.item_ID)
+        super(ImageSpatialExtentsProperty, self).print_box()
+        print("image_width  :", self.image_width)
+        print("image_height :", self.image_height)
 
 
 # -----------------------------------

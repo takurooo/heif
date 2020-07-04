@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -35,7 +34,7 @@ class ChunkOffsetBox(FullBox):
 
         self.entry_count = reader.read32()
 
-        if self.get_box_type() == 'stco':
+        if self.get_type() == 'stco':
             for i in range(self.entry_count):
                 self.chunk_offset.append(reader.read32())
         else:
@@ -43,13 +42,13 @@ class ChunkOffsetBox(FullBox):
             for i in range(self.entry_count):
                 self.chunk_offset.append(reader.read64())
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
-
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(ChunkOffsetBox, self).print_box()
         print("entry_count  :", self.entry_count)
         print("chunk_offset :", self.chunk_offset)
+
 
 # -----------------------------------
 # main

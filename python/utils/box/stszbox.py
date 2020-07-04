@@ -1,7 +1,6 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
 
 
@@ -41,7 +40,7 @@ class SampleSizeBox(FullBox):
             for i in range(self.sample_count):
                 self.entry_size.append(reader.read32())
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def get_sample_size(self, idx):
         if self.sample_size == 0:
@@ -54,6 +53,7 @@ class SampleSizeBox(FullBox):
         print("sample_size  :", self.sample_size)
         print("sample_count :", self.sample_count)
         print("entry_size   :", self.entry_size)
+
 
 # -----------------------------------
 # main

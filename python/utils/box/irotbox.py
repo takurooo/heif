@@ -1,7 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import FullBox
+from utils.box.item_property import ItemProperty
 
 
 # -----------------------------------
@@ -15,32 +15,26 @@ from utils.box.basebox import FullBox
 # -----------------------------------
 # class
 # -----------------------------------
-
-
-class PrimaryItemBox(FullBox):
+class ItemRotation(ItemProperty):
     """
-    Box Type: ‘pitm’
-    Container: Meta box (‘meta’)
-    Mandatory: No
-    Quantity: Zero or one
+    ISO/IEC 23008-12
+    Box Type: ‘irot’
     """
 
     def __init__(self):
-        super(PrimaryItemBox, self).__init__()
-        self.item_ID = None
+        super(ItemRotation, self).__init__()
+        self.angle = None
 
     def parse(self, reader):
-        super(PrimaryItemBox, self).parse(reader)
+        super(ItemRotation, self).parse(reader)
 
-        self.item_ID = reader.read16()
+        tmp = reader.read8()
+        self.angle = (tmp & 0x3)
         assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_primary_item_id(self):
-        return self.item_ID
-
     def print_box(self):
-        super(PrimaryItemBox, self).print_box()
-        print('item_ID :', self.item_ID)
+        super(ItemRotation, self).print_box()
+        print("angle :", self.angle)
 
 
 # -----------------------------------

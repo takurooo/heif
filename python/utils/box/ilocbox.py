@@ -32,6 +32,7 @@ class ItemLocation:
     CONSTRUCTION_METHOD_FILE_OFFSET = 0
     CONSTRUCTION_METHOD_IDAT_OFFSET = 1
     CONSTRUCTION_METHOD_ITEM_OFFSET = 2
+
     def __init__(self):
         self.item_ID = None
         self.construction_method = None
@@ -71,7 +72,7 @@ class ItemLocationBox(FullBox):
     def parse(self, reader):
         super(ItemLocationBox, self).parse(reader)
 
-        tmp = reader.read16('big')
+        tmp = reader.read16()
         # offset_size is taken from the set {0, 4, 8} and indicates the length data bytes of the offset field.
         self.offset_size = (tmp & 0xf000) >> 12
         # length_size is taken from the set {0, 4, 8} and indicates the length data bytes of the length field.
@@ -79,50 +80,50 @@ class ItemLocationBox(FullBox):
         # base_offset_size is taken from the set {0, 4, 8} and indicates the length data bytes of the base_offset field.
         self.base_offset_size = (tmp & 0x00f0) >> 4
 
-        if self.version == 1 or self.version == 2:
+        if self.get_version() == 1 or self.get_version() == 2:
             self.index_size = tmp & 0x000f
         else:
             # reversed = data & 0x000f
             self.index_size = None
 
-        if self.version < 2:
-            item_count = reader.read16('big')
+        if self.get_version() < 2:
+            item_count = reader.read16()
         else:
-            item_count = reader.read32('big')
+            item_count = reader.read32()
 
         for i in range(item_count):
             item_loc = ItemLocation()
 
-            if self.version < 2:
-                item_loc.item_ID = reader.read16('big')
-            elif self.version == 2:
-                item_loc.item_ID = reader.read32('big')
+            if self.get_version() < 2:
+                item_loc.item_ID = reader.read16()
+            elif self.get_version() == 2:
+                item_loc.item_ID = reader.read32()
 
-            if self.version == 1 or self.version == 2:
-                tmp = reader.read16('big')
+            if self.get_version() == 1 or self.get_version() == 2:
+                tmp = reader.read16()
                 # reversed = (data & 0xfff0) >> 4
                 item_loc.construction_method = tmp & 0x000f  # 0:file 1:idat 2:item
             else:
                 item_loc.construction_method = 0  # 0:file 1:idat 2:item
 
-            item_loc.data_reference_index = reader.read16('big')
-            item_loc.base_offset = reader.readn(self.base_offset_size * 8, 'big')
+            item_loc.data_reference_index = reader.read16()
+            item_loc.base_offset = reader.readn(self.base_offset_size * 8)
 
-            extent_count = reader.read16('big')
+            extent_count = reader.read16()
             for j in range(extent_count):
 
                 item_loc_ext = ItemLocationExtent()
 
-                if (self.version == 1 or self.version == 2) and 0 < self.index_size:
-                    item_loc_ext.extent_index = reader.readn(self.index_size * 8, 'big')
-                item_loc_ext.extent_offset = reader.readn(self.offset_size * 8, 'big')
-                item_loc_ext.extent_length = reader.readn(self.length_size * 8, 'big')
+                if (self.get_version() == 1 or self.get_version() == 2) and 0 < self.index_size:
+                    item_loc_ext.extent_index = reader.readn(self.index_size * 8)
+                item_loc_ext.extent_offset = reader.readn(self.offset_size * 8)
+                item_loc_ext.extent_length = reader.readn(self.length_size * 8)
 
                 item_loc.item_loc_ext_list.append(item_loc_ext)
 
             self.item_loc_list.append(item_loc)
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(ItemLocationBox, self).print_box()
@@ -132,14 +133,14 @@ class ItemLocationBox(FullBox):
         print("item_count :", len(self.item_loc_list))
         for item_iloc in self.item_loc_list:
             print("\titem_ID :", item_iloc.item_ID)
-            print("\tconstruction_method :", item_iloc.construction_method)
-            print("\tdata_reference_index :", item_iloc.data_reference_index)
-            print("\tbase_offset :", item_iloc.base_offset)
-            print("\textent_count :", len(item_iloc.item_loc_ext_list))
+            print("\t\tconstruction_method  :", item_iloc.construction_method)
+            print("\t\tdata_reference_index :", item_iloc.data_reference_index)
+            print("\t\tbase_offset          :", item_iloc.base_offset)
+            print("\t\textent_count         :", len(item_iloc.item_loc_ext_list))
             for item_iloc_ext in item_iloc.item_loc_ext_list:
-                print("\t\textent_offset :", item_iloc_ext.extent_offset)
-                print("\t\textent_length :", item_iloc_ext.extent_length)
-                print("\t\textent_index :", item_iloc_ext.extent_index)
+                print("\t\t\textent_offset :", item_iloc_ext.extent_offset)
+                print("\t\t\textent_length :", item_iloc_ext.extent_length)
+                print("\t\t\textent_index  :", item_iloc_ext.extent_index)
 
     def get_item_loc(self, item_ID):
 
@@ -156,7 +157,6 @@ class ItemLocationBox(FullBox):
                 return True
 
         return False
-
 
 
 # -----------------------------------

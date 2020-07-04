@@ -1,7 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import FullBox
+from utils.box.item_property import ItemFullProperty
 
 
 # -----------------------------------
@@ -15,32 +15,28 @@ from utils.box.basebox import FullBox
 # -----------------------------------
 # class
 # -----------------------------------
-
-
-class PrimaryItemBox(FullBox):
+class PixelInformationProperty(ItemFullProperty):
     """
-    Box Type: ‘pitm’
-    Container: Meta box (‘meta’)
-    Mandatory: No
-    Quantity: Zero or one
+    ISO/IEC 23008-12
+    Box Type: ‘pixi’
     """
 
     def __init__(self):
-        super(PrimaryItemBox, self).__init__()
-        self.item_ID = None
+        super(PixelInformationProperty, self).__init__()
+        self.num_channels = None
+        self.bits_per_channel = []
 
     def parse(self, reader):
-        super(PrimaryItemBox, self).parse(reader)
-
-        self.item_ID = reader.read16()
+        super(PixelInformationProperty, self).parse(reader)
+        self.num_channels = reader.read8()
+        for i in range(self.num_channels):
+            self.bits_per_channel.append(reader.read8())
         assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_primary_item_id(self):
-        return self.item_ID
-
     def print_box(self):
-        super(PrimaryItemBox, self).print_box()
-        print('item_ID :', self.item_ID)
+        super(PixelInformationProperty, self).print_box()
+        print("image_width  :", self.num_channels)
+        print("image_height :", self.bits_per_channel)
 
 
 # -----------------------------------

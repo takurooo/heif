@@ -1,9 +1,8 @@
 # -----------------------------------
 # import
 # -----------------------------------
-from utils.box.basebox import Box
 from utils.box.basebox import FullBox
-from utils.box import boxutils
+
 
 # -----------------------------------
 # define
@@ -39,7 +38,7 @@ class VideoMediaHeaderBox(FullBox):
         for _ in range(3):
             self.opcolor.append(reader.read16())  # {0,0,0}
 
-        assert self.read_box_done(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
     def print_box(self):
         super(VideoMediaHeaderBox, self).print_box()
