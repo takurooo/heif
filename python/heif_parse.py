@@ -1,8 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
-import os
 import argparse
+import os
+
 from utils.heif.heifreader import HeifReader
 
 # -----------------------------------
@@ -10,13 +11,14 @@ from utils.heif.heifreader import HeifReader
 # -----------------------------------
 CUR_PATH = os.path.join(os.path.dirname(__file__))
 
+
 # -----------------------------------
 # function
 # -----------------------------------
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="HEIF parser.")
+    parser = argparse.ArgumentParser(description="Parse HEIF file.")
     parser.add_argument("img_path", type=str, help="path2your_image", default=None)
     return parser.parse_args()
 
@@ -28,7 +30,8 @@ def get_args():
 def main(args):
     img_path = args.img_path
     heif_reader = HeifReader(img_path)
-    heif_reader.print_boxes()
+    heif_reader.box_reader.print_boxes()
+
 
 if __name__ == '__main__':
     main(get_args())

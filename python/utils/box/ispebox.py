@@ -33,6 +33,9 @@ class ImageSpatialExtentsProperty(ItemFullProperty):
         self.image_height = reader.read32()
         assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
 
+    def get_image_width_height(self):
+        return self.image_width, self.image_height
+
     def print_box(self):
         super(ImageSpatialExtentsProperty, self).print_box()
         print("image_width  :", self.image_width)

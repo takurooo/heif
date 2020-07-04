@@ -36,11 +36,19 @@ class FileTypeBox(Box):
         self.minor_version = reader.read32(decode=False)
 
         self.compatible_brands = []
-
         while not self.read_complete(reader):
             self.compatible_brands.append(reader.read32(decode=True))
 
         assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+
+    def get_major_brand(self):
+        return self.major_brand
+
+    def get_minor_version(self):
+        return self.minor_version
+
+    def get_compatible_brands(self):
+        return self.compatible_brands
 
     def print_box(self):
         super(FileTypeBox, self).print_box()

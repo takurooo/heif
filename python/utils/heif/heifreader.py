@@ -1,11 +1,10 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from enum import Enum
+
+from utils.box.boxreader import BoxReader
 from utils.file.binaryfilereader import BinaryFileReader
-from utils.box.ftypebox import FileTypeBox
-from utils.box.metabox import MetaBox
-from utils.box.mdatbox import MediaDataBox
-from utils.box import boxutils
 
 
 # -----------------------------------
@@ -21,7 +20,7 @@ from utils.box import boxutils
 # -----------------------------------
 
 
-class ITEM_TYPE:
+class ItemType(Enum):
     HVC1 = 'hvc1'
     GRID = 'grid'
     EXIF = 'Exif'
@@ -29,83 +28,174 @@ class ITEM_TYPE:
 
 
 class HeifReader:
+    """
+    Class for reading HEIF file.
+
+    Attributes
+    ----------
+    img_path : str
+        File path of HEIF file.
+    item_properties : dict
+        Item properties associated with item.
+    box_reader : BoxReader
+        Reader for ISO Base Media File Format.
+    box_reader : BinaryFileReader
+        Reader for binary file。
+    """
 
     def __init__(self, img_path):
         self.img_path = img_path
 
-        self.ftyp = None
-        self.meta = None
-        self.mdat = None
         self.item_properties = {}
 
-        self.reader = BinaryFileReader(img_path)
-        self._read_boxes(self.reader)
+        self.box_reader = BoxReader()
+        self.binary_reader = BinaryFileReader(img_path)
+
+        self.box_reader.read_boxes(self.binary_reader)
+        self.binary_reader.seek(0)
+
         self._associate_item_property()
-        self.reader.seek(0)
+
+    def __del__(self):
+        self.binary_reader.close()
 
     def _associate_item_property(self):
-        ipma = self.meta.iprp.ipma
-        ipco = self.meta.iprp.ipco
+        ipma = self.box_reader.meta.iprp.ipma
+        ipco = self.box_reader.meta.iprp.ipco
 
         prop_list = ipco.get_item_properties()
         for association in ipma.get_item_property_association():
             self.item_properties[association.item_ID] = []
             for prop_idx in association.property_index:
-                prop = prop_list[prop_idx-1]
+                prop = prop_list[prop_idx - 1]
                 self.item_properties[association.item_ID].append(prop)
 
-    def _read_boxes(self, reader):
-        reader.seek(0)
+    def get_major_brand(self):
+        """
+         Get major version from the FileTypeBox.
 
-        while reader.num_bytes_left():
-            box_size, box_type = boxutils.read_box_header(reader)
-            # print(box_type)
+         Returns
+         -------
+         major_version : str
+             major version.
+         """
+        return self.box_reader.ftyp.get_major_brand()
 
-            if box_type == 'ftyp':
-                self.ftyp = FileTypeBox()
-                self.ftyp.parse(reader)
-            elif box_type == 'meta':
-                self.meta = MetaBox()
-                self.meta.parse(reader)
-            elif box_type == 'mdat':
-                self.mdat = MediaDataBox()
-                self.mdat.parse(reader)
-            else:
-                reader.seek(box_size, 1)
+    def get_minor_version(self):
+        """
+         Get minor version from the FileTypeBox.
 
-    def __del__(self):
-        self.reader.close()
+         Returns
+         -------
+         minor_version : int
+             minor version.
+         """
+        return self.box_reader.ftyp.get_minor_version()
 
-    def print_boxes(self):
-        if self.ftyp is not None:
-            self.ftyp.print_box()
-        if self.meta is not None:
-            self.meta.print_box()
+    def get_compatible_brands(self):
+        """
+        Get list of compatible brand from the FileTypeBox.
 
-    # def get_boxtype_list(self):
-    #     return self.boxtype_list
-
-    # def get_box(self, boxtype):
-    #     return self.box_reader.get_box(boxtype)
-
-    def get_primary_item_id(self):
-        return self.meta.pitm.get_primary_item_id()
-
-    def get_item_properties(self, item_ID):
-        return self.item_properties[item_ID]
-
-    def get_item_type(self, item_ID):
-        return self.meta.iinf.get_item_type(item_ID)
+        Returns
+        -------
+        compatible_brands : list
+            List of compatible brand.
+        """
+        return self.box_reader.ftyp.get_compatible_brands()
 
     def get_item_id_list(self):
-        return self.meta.iinf.get_item_id_list()
+        """
+        Get list of item id from the ItemInformationBox.
 
-    def get_item_offset_size(self, item_ID):
-        iloc = self.meta.iloc
+        Returns
+        -------
+        item_id_list : list
+            List of item id.
+        """
+        return self.box_reader.meta.iinf.get_item_id_list()
+
+    def get_item_id_list_by_type(self, item_type):
+        """
+        Get list of item id from the ItemInformationBox by item type.
+
+        Parameters
+        ----------
+        item_type : ItemType
+            Type of item.
+
+        Returns
+        -------
+        item_id_list : list
+            List of item id.
+        """
+        item_id_list = []
+        for item_id in self.box_reader.meta.iinf.get_item_id_list():
+            if item_type == self.get_item_type(item_id):
+                item_id_list.append(item_id)
+        return item_id_list
+
+    def get_primary_item_id(self):
+        """
+        Get primary item id from the PrimaryItemBox.
+
+        Returns
+        -------
+        primary_item_id : list
+            Primary item id.
+        """
+        return self.box_reader.meta.pitm.get_primary_item_id()
+
+    def get_item_type(self, item_id):
+        """
+        Get item type from the ItemInformationBox by item id.
+
+        Parameters
+        ----------
+        item_id : int
+            ID of item.
+
+        Returns
+        -------
+        item_type : ItemType
+            Type of item.
+        """
+        return self.box_reader.meta.iinf.get_item_type(item_id)
+
+    def get_item_properties(self, item_id):
+        """
+        Get item properties from the ItemPropertiesBox by item id.
+
+        Parameters
+        ----------
+        item_id : int
+            ID of item.
+
+        Returns
+        -------
+        item_properties : list
+            List of item property.
+        """
+        return self.item_properties[item_id]
+
+    def get_item_offsets_sizes(self, item_id):
+        """
+         Get list of location from the ItemLocationBox by item id.
+
+         Parameters
+         ----------
+         item_id : int
+             ID of item.
+
+         Returns
+         -------
+         location : list
+             List of item location.
+         """
+        iloc = self.box_reader.meta.iloc
         assert iloc is not None, 'iloc not found.'
-        assert iloc.has_item_id_entry(item_ID), 'invali item id {}'.format(item_ID)
+        assert iloc.has_item_id_entry(item_id), 'invali item id {}'.format(item_id)
 
-        item_loc = iloc.get_item_loc(item_ID)
+        item_loc = iloc.get_item_loc(item_id)
 
         construction_method = item_loc.get_construction_method()
         base_offset = item_loc.get_base_offset()
@@ -126,15 +216,54 @@ class HeifReader:
 
         return item_offset_list, item_size_list
 
-    def read_item(self, item_ID):
-        item_offset_list, item_size_list = self.get_item_offset_size(item_ID)
+    def get_item_width_height(self, item_id):
+        """
+          Get list of resolution from the ImageSpatialExtentsProperty by item id.
 
+          Parameters
+          ----------
+          item_id : int
+              ID of item.
+
+          Returns
+          -------
+          reolution : tuple
+              Tuple of item resolution.
+          """
+        for item_property in self.item_properties[item_id]:
+            if item_property.get_type() == 'ispe':
+                ispe = item_property
+                return ispe.get_image_width_height()
+
+        return None
+
+    def read_item(self, item_id):
+        """
+          Get item binary data by item id.
+
+          Parameters
+          ----------
+          item_id : int
+              ID of item.
+
+          Returns
+          -------
+          item : byte
+              item data.
+          """
+        item_offset_list, item_size_list = self.get_item_offsets_sizes(item_id)
         item_data = b''
         for item_offset, item_size in zip(item_offset_list, item_size_list):
-            self.reader.seek(item_offset)
-            item_data += self.reader.read_raw(item_size)
+            self.binary_reader.seek(item_offset)
+            item_data += self.binary_reader.read_raw(item_size)
 
         return item_data
+
+    def print_boxex(self):
+        """
+          Display box information.
+        """
+        self.box_reader.print_boxes()
 
 
 # -----------------------------------
