@@ -4,7 +4,7 @@
 import argparse
 import os
 
-from utils.heif.heifreader import HeifReader
+from api.heif.heifreader import HeifReader, ItemType
 
 # -----------------------------------
 # define

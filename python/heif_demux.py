@@ -3,7 +3,7 @@
 # -----------------------------------
 import os
 import argparse
-from utils.heif.heifreader import HeifReader, ItemType
+from api.heif.heifreader import HeifReader, ItemType
 from utils.com.listutils import list_from_dir
 
 # -----------------------------------
