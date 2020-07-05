@@ -30,7 +30,7 @@ def get_args():
 def main(args):
     img_path = args.img_path
     heif_reader = HeifReader(img_path)
-    heif_reader.box_reader.print_boxes()
+    heif_reader.print_boxes()
 
 
 if __name__ == '__main__':

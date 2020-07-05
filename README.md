@@ -41,4 +41,4 @@ HeifReader functions
 |  get_item_offsets_sizes(item_id)    |  Get list of location from the ItemLocationBox by item id.                |
 |  get_item_width_height(item_id)     |  Get list of resolution from the ImageSpatialExtentsProperty by item id.  |
 |  read_item(item_id)                 |  Get item binary data by item id.                                         |
-|  print_boxex()                      |  Display box information.                                                 |
+|  print_boxes()                      |  Display box information.                                                 |

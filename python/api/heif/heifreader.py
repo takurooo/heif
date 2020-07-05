@@ -259,7 +259,7 @@ class HeifReader:
 
         return item_data
 
-    def print_boxex(self):
+    def print_boxes(self):
         """
           Display box information.
         """
