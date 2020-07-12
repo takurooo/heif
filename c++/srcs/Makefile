@@ -1,13 +1,25 @@
-CC = g++
-CFLAGS = -std=c++14
-OBJS = main.o  util.o boxreader.o bitstream.o box.o fullbox.o ftypbox.o metabox.o mdatbox.o hdlrbox.o pitmbox.o iinfbox.o ilocbox.o
-PROGRAM = a.out
+
+SRCDIR := .
+SRCS := $(wildcard $(SRCDIR)/*.cpp)
+# SRC := main.cpp  util.cpp boxreader.cpp bitstream.cpp \
+# 		box.cpp fullbox.cpp ftypbox.cpp metabox.cpp \
+# 		mdatbox.cpp hdlrbox.cpp pitmbox.cpp iinfbox.cpp ilocbox.cpp
+OBJS := $(SRCS:.cpp=.o)
+INCDIR := $(SRCDIR)
+CC := g++
+CFLAGS := -std=c++14
+PROGRAM := a.out
+
+# for debug
+# $(warning CFLAGS = $(CFLAGS))
+# $(warning OBJS = $(OBJS))
+# $(warning SRCS = $(SRCS))
 
 all:	$(PROGRAM)
 
 $(PROGRAM): $(OBJS)
-	$(CC) $(OBJS) $(CFLAGS) -o $(PROGRAM)
+	$(CC) $(CFLAGS) $(OBJS) -o $(PROGRAM)
 
-.PHONY: clean
+.PHONY: clean # task target
 clean:
-	rm -f *.o $(PROGRAM)
+	rm -f $(OBJS) $(PROGRAM)

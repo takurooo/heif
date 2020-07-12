@@ -5,8 +5,6 @@
 #include <sys/stat.h>
 #include "type.h"
 #include "util.h"
-#include "fourcc.h"
-#include "bitstream.h"
 #include "boxreader.h"
 // ctrl+option+nで実行
 
