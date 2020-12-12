@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -30,7 +31,7 @@ class CompositionTimeToSample(FullBox):
         self.sample_count = []
         self.sample_offset = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(CompositionTimeToSample, self).parse(reader)
 
         self.entry_count = reader.read32()
@@ -44,9 +45,10 @@ class CompositionTimeToSample(FullBox):
                 self.sample_count.append(reader.read32())
                 self.sample_offset.append(reader.read32(signed=True))
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(CompositionTimeToSample, self).print_box()
         print("entry_count   :", self.entry_count)
         print("sample_count  :", self.sample_count)

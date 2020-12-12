@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,17 +27,17 @@ class MovieHeaderBox(FullBox):
 
     def __init__(self):
         super(MovieHeaderBox, self).__init__()
-        self.creation_time = None
-        self.modification_time = None
-        self.timescale = None
-        self.duration = None
-        self.rate = None
-        self.volume = None
-        self.matrix = None
-        self.predefined = None
-        self.next_track_ID = None
+        self.creation_time = 0
+        self.modification_time = 0
+        self.timescale = 0
+        self.duration = 0
+        self.rate = 0
+        self.volume = 0
+        self.matrix = 0
+        self.predefined = 0
+        self.next_track_ID = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MovieHeaderBox, self).parse(reader)
 
         if self.get_version() == 1:
@@ -67,9 +68,10 @@ class MovieHeaderBox(FullBox):
 
         self.next_track_ID = reader.read32()
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MovieHeaderBox, self).print_box()
         print("creation_time :", self.creation_time)
         print("modification_time :", self.modification_time)

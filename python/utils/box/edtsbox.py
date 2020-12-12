@@ -4,6 +4,7 @@
 from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.elstbox import EditListBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 # -----------------------------------
 # define
@@ -16,6 +17,8 @@ from utils.box.elstbox import EditListBox
 # -----------------------------------
 # class
 # -----------------------------------
+
+
 class EditBox(Box):
     """
     ISO/IEC 14496-12
@@ -29,7 +32,7 @@ class EditBox(Box):
         super(EditBox, self).__init__()
         self.elst = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(EditBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -41,9 +44,10 @@ class EditBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(EditBox, self).print_box()
         if self.elst is not None:
             self.elst.print_box()

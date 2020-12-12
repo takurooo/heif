@@ -4,6 +4,7 @@
 from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -23,16 +24,16 @@ class SampleEntry(Box):
 
     def __init__(self):
         super(SampleEntry, self).__init__()
-        self.data_reference_index = None
+        self.data_reference_index = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SampleEntry, self).parse(reader)
 
         for _ in range(6):
             _ = reader.read8()  # reserved=0
         self.data_reference_index = reader.read16()
 
-    def print_box(self):
+    def print_box(self) -> None:
         print("data_reference_index :", self.data_reference_index)
 
 
@@ -40,12 +41,12 @@ class AudioSampleEntry(SampleEntry):
 
     def __init__(self):
         super(AudioSampleEntry, self).__init__()
-        self.channelcount = None
-        self.samplesize = None
-        self.pre_defined = None
-        self.samplerate = None
+        self.channelcount = 0
+        self.samplesize = 0
+        self.pre_defined = 0
+        self.samplerate = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(AudioSampleEntry, self).parse(reader)
 
         for _ in range(2):
@@ -58,7 +59,7 @@ class AudioSampleEntry(SampleEntry):
 
         self.to_box_end(reader)  # TODO
 
-    def print_box(self):
+    def print_box(self) -> None:
         print("channelcount :", self.channelcount)
         print("samplesize   :", self.samplesize)
         print("samplerate   :", self.samplerate)
@@ -80,7 +81,7 @@ class SampleDescriptionBox(FullBox):
         self.ipcm = None
         self.rtmd = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SampleDescriptionBox, self).parse(reader)
 
         self.entry_count = reader.read32()
@@ -95,14 +96,16 @@ class SampleDescriptionBox(FullBox):
             elif box_type == 'ipcm':
                 self.ipcm = AudioSampleEntry()
                 self.ipcm.parse(reader)
-            elif box_type == 'rtmd':  # Real Time Metadata Sample Entry(XAVC Format)
+            # Real Time Metadata Sample Entry(XAVC Format)
+            elif box_type == 'rtmd':
                 reader.seek(box_size, 1)  # TODO rtmd
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SampleDescriptionBox, self).print_box()
         if self.avc1 is not None:
             self.avc1.print_box()

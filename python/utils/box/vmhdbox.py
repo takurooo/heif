@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -28,19 +29,20 @@ class VideoMediaHeaderBox(FullBox):
 
     def __init__(self):
         super(VideoMediaHeaderBox, self).__init__()
-        self.graphicsmode = None
+        self.graphicsmode = 0
         self.opcolor = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(VideoMediaHeaderBox, self).parse(reader)
 
         self.graphicsmode = reader.read16()  # copy = 0
         for _ in range(3):
             self.opcolor.append(reader.read16())  # {0,0,0}
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(VideoMediaHeaderBox, self).print_box()
         print("graphicmode :", self.graphicsmode)
         print("opcolor     :", self.opcolor)

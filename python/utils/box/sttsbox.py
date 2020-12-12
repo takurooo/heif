@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,11 +27,11 @@ class DecodingTimeToSampleBox(FullBox):
 
     def __init__(self):
         super(DecodingTimeToSampleBox, self).__init__()
-        self.entry_count = None
+        self.entry_count = 0
         self.sample_count = []
         self.sample_delta = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(DecodingTimeToSampleBox, self).parse(reader)
 
         self.entry_count = reader.read32()
@@ -39,9 +40,10 @@ class DecodingTimeToSampleBox(FullBox):
             self.sample_count.append(reader.read32())
             self.sample_delta.append(reader.read32())
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(DecodingTimeToSampleBox, self).print_box()
         print("entry_count   :", self.entry_count)
         print("sample_count  :", self.sample_count)

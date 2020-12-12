@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.item_property import ItemProperty
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -25,14 +26,15 @@ class ItemRotation(ItemProperty):
         super(ItemRotation, self).__init__()
         self.angle = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemRotation, self).parse(reader)
 
         tmp = reader.read8()
         self.angle = (tmp & 0x3)
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemRotation, self).print_box()
         print("angle :", self.angle)
 

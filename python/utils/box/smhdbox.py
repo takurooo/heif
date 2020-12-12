@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -28,17 +29,18 @@ class SoundMediaHeaderBox(FullBox):
 
     def __init__(self):
         super(SoundMediaHeaderBox, self).__init__()
-        self.balance = None
+        self.balance = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SoundMediaHeaderBox, self).parse(reader)
 
         self.balance = reader.read16()  # balance = 0
         _ = reader.read16()  # reserved = 0
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SoundMediaHeaderBox, self).print_box()
         print("balance :", self.balance)
 

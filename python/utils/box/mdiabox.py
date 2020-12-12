@@ -6,6 +6,7 @@ from utils.box.basebox import Box
 from utils.box.hdlrbox import HandlerReferenceBox
 from utils.box.mdhdbox import MediaHeaderBox
 from utils.box.minfbox import MediaInformationBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -36,7 +37,7 @@ class MediaBox(Box):
         self.hdlr = None
         self.minf = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MediaBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -53,9 +54,10 @@ class MediaBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MediaBox, self).print_box()
         if self.mdhd is not None:
             self.mdhd.print_box()

@@ -2,7 +2,9 @@
 # import
 # -----------------------------------
 from enum import Enum
+from typing import List, Tuple
 
+from utils.box.item_property import ItemProperty
 from utils.box.boxreader import BoxReader
 from utils.file.binaryfilereader import BinaryFileReader
 
@@ -43,7 +45,7 @@ class HeifReader:
         Reader for binary file。
     """
 
-    def __init__(self, img_path):
+    def __init__(self, img_path: str):
         self.img_path = img_path
 
         self.item_properties = {}
@@ -59,7 +61,7 @@ class HeifReader:
     def __del__(self):
         self.binary_reader.close()
 
-    def _associate_item_property(self):
+    def _associate_item_property(self) -> None:
         ipma = self.box_reader.meta.iprp.ipma
         ipco = self.box_reader.meta.iprp.ipco
 
@@ -70,7 +72,7 @@ class HeifReader:
                 prop = prop_list[prop_idx - 1]
                 self.item_properties[association.item_ID].append(prop)
 
-    def get_major_brand(self):
+    def get_major_brand(self) -> str:
         """
          Get major version from the FileTypeBox.
 
@@ -81,7 +83,7 @@ class HeifReader:
          """
         return self.box_reader.ftyp.get_major_brand()
 
-    def get_minor_version(self):
+    def get_minor_version(self) -> int:
         """
          Get minor version from the FileTypeBox.
 
@@ -92,7 +94,7 @@ class HeifReader:
          """
         return self.box_reader.ftyp.get_minor_version()
 
-    def get_compatible_brands(self):
+    def get_compatible_brands(self) -> List[str]:
         """
         Get list of compatible brand from the FileTypeBox.
 
@@ -103,7 +105,7 @@ class HeifReader:
         """
         return self.box_reader.ftyp.get_compatible_brands()
 
-    def get_item_id_list(self):
+    def get_item_id_list(self) -> List[int]:
         """
         Get list of item id from the ItemInformationBox.
 
@@ -114,7 +116,7 @@ class HeifReader:
         """
         return self.box_reader.meta.iinf.get_item_id_list()
 
-    def get_item_id_list_by_type(self, item_type):
+    def get_item_id_list_by_type(self, item_type: ItemType) -> List[int]:
         """
         Get list of item id from the ItemInformationBox by item type.
 
@@ -134,18 +136,18 @@ class HeifReader:
                 item_id_list.append(item_id)
         return item_id_list
 
-    def get_primary_item_id(self):
+    def get_primary_item_id(self) -> int:
         """
         Get primary item id from the PrimaryItemBox.
 
         Returns
         -------
-        primary_item_id : list
+        primary_item_id : int
             Primary item id.
         """
         return self.box_reader.meta.pitm.get_primary_item_id()
 
-    def get_item_type(self, item_id):
+    def get_item_type(self, item_id: int) -> str:
         """
         Get item type from the ItemInformationBox by item id.
 
@@ -161,7 +163,7 @@ class HeifReader:
         """
         return self.box_reader.meta.iinf.get_item_type(item_id)
 
-    def get_item_properties(self, item_id):
+    def get_item_properties(self, item_id: int) -> List[ItemProperty]:
         """
         Get item properties from the ItemPropertiesBox by item id.
 
@@ -177,7 +179,7 @@ class HeifReader:
         """
         return self.item_properties[item_id]
 
-    def get_item_offsets_sizes(self, item_id):
+    def get_item_offsets_sizes(self, item_id: int) -> Tuple[List[int], List[int]]:
         """
          Get list of location from the ItemLocationBox by item id.
 
@@ -193,7 +195,8 @@ class HeifReader:
          """
         iloc = self.box_reader.meta.iloc
         assert iloc is not None, 'iloc not found.'
-        assert iloc.has_item_id_entry(item_id), 'invali item id {}'.format(item_id)
+        assert iloc.has_item_id_entry(
+            item_id), 'invali item id {}'.format(item_id)
 
         item_loc = iloc.get_item_loc(item_id)
 
@@ -214,9 +217,9 @@ class HeifReader:
             item_offset_list.append(item_offset)
             item_size_list.append(item_size)
 
-        return item_offset_list, item_size_list
+        return (item_offset_list, item_size_list)
 
-    def get_item_width_height(self, item_id):
+    def get_item_width_height(self, item_id: int) -> Tuple[int, int]:
         """
           Get list of resolution from the ImageSpatialExtentsProperty by item id.
 
@@ -235,9 +238,9 @@ class HeifReader:
                 ispe = item_property
                 return ispe.get_image_width_height()
 
-        return None
+        return (0, 0)
 
-    def read_item(self, item_id):
+    def read_item(self, item_id: int) -> bytes:
         """
           Get item binary data by item id.
 
@@ -259,7 +262,7 @@ class HeifReader:
 
         return item_data
 
-    def print_boxes(self):
+    def print_boxes(self) -> None:
         """
           Display box information.
         """

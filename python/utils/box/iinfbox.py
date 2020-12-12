@@ -1,9 +1,11 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import List
 from utils.box import boxutils
 from utils.box.basebox import FullBox
 from utils.box.infebox import ItemInfoEntry
+from utils.file.binaryfilereader import BinaryFileReader
 
 # -----------------------------------
 # define
@@ -29,10 +31,10 @@ class ItemInformationBox(FullBox):
 
     def __init__(self):
         super(ItemInformationBox, self).__init__()
-        self.infe_list = None
-        self.item_id_list = None  # 後で使う用
+        self.infe_list = []
+        self.item_id_list = []  # 後で使う用
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemInformationBox, self).parse(reader)
 
         if self.get_version() == 0:
@@ -51,22 +53,24 @@ class ItemInformationBox(FullBox):
                 self.item_id_list.append(infe.item_ID)  # 後で使う用
                 self.infe_list.append(infe)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemInformationBox, self).print_box()
         print("entry_count :", len(self.infe_list))
         for infe in self.infe_list:
             infe.print_box()
 
-    def get_item_id_list(self):
+    def get_item_id_list(self) -> List[int]:
         return self.item_id_list
 
-    def get_item_type(self, item_ID):
+    def get_item_type(self, item_ID: int) -> str:
         assert item_ID in self.item_id_list, 'invalid item id'
         for infe in self.infe_list:
             if infe.item_ID == item_ID:
                 return infe.item_type
+        return ""
 
 
 # -----------------------------------

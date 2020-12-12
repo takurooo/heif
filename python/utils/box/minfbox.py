@@ -7,6 +7,7 @@ from utils.box.hmhdbox import HintMediaHeaderBox
 from utils.box.smhdbox import SoundMediaHeaderBox
 from utils.box.stblbox import SampleTableBox
 from utils.box.vmhdbox import VideoMediaHeaderBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -42,7 +43,7 @@ class MediaInformationBox(Box):
         self.dref = None
         self.stbl = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MediaInformationBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -71,9 +72,10 @@ class MediaInformationBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MediaInformationBox, self).print_box()
         if self.vmhd is not None:
             self.vmhd.print_box()

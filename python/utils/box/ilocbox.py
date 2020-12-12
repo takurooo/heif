@@ -1,7 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import List, Optional
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -17,14 +19,14 @@ from utils.box.basebox import FullBox
 # -----------------------------------
 class ItemLocationExtent:
     def __init__(self):
-        self.extent_offset = None
-        self.extent_length = None
-        self.extent_index = None
+        self.extent_offset = 0
+        self.extent_length = 0
+        self.extent_index = 0
 
-    def get_extent_offset(self):
+    def get_extent_offset(self) -> int:
         return self.extent_offset
 
-    def get_extent_length(self):
+    def get_extent_length(self) -> int:
         return self.extent_length
 
 
@@ -34,22 +36,22 @@ class ItemLocation:
     CONSTRUCTION_METHOD_ITEM_OFFSET = 2
 
     def __init__(self):
-        self.item_ID = None
-        self.construction_method = None
-        self.data_reference_index = None
-        self.base_offset = None
+        self.item_ID = 0
+        self.construction_method = 0
+        self.data_reference_index = 0
+        self.base_offset = 0
         self.item_loc_ext_list = []
 
-    def get_item_ID(self):
+    def get_item_ID(self) -> int:
         return self.item_ID
 
-    def get_construction_method(self):
+    def get_construction_method(self) -> int:
         return self.construction_method
 
-    def get_base_offset(self):
+    def get_base_offset(self) -> int:
         return self.base_offset
 
-    def get_extent_list(self):
+    def get_extent_list(self) -> List[ItemLocationExtent]:
         return self.item_loc_ext_list
 
 
@@ -67,9 +69,10 @@ class ItemLocationBox(FullBox):
         self.offset_size = None
         self.length_size = None
         self.base_offset_size = None
+        self.index_size = 0
         self.item_loc_list = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemLocationBox, self).parse(reader)
 
         tmp = reader.read16()
@@ -84,7 +87,7 @@ class ItemLocationBox(FullBox):
             self.index_size = tmp & 0x000f
         else:
             # reversed = data & 0x000f
-            self.index_size = None
+            self.index_size = 0
 
         if self.get_version() < 2:
             item_count = reader.read16()
@@ -115,7 +118,8 @@ class ItemLocationBox(FullBox):
                 item_loc_ext = ItemLocationExtent()
 
                 if (self.get_version() == 1 or self.get_version() == 2) and 0 < self.index_size:
-                    item_loc_ext.extent_index = reader.readn(self.index_size * 8)
+                    item_loc_ext.extent_index = reader.readn(
+                        self.index_size * 8)
                 item_loc_ext.extent_offset = reader.readn(self.offset_size * 8)
                 item_loc_ext.extent_length = reader.readn(self.length_size * 8)
 
@@ -123,9 +127,10 @@ class ItemLocationBox(FullBox):
 
             self.item_loc_list.append(item_loc)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemLocationBox, self).print_box()
         print("offset_size :", self.offset_size)
         print("length_size :", self.length_size)
@@ -136,13 +141,14 @@ class ItemLocationBox(FullBox):
             print("\t\tconstruction_method  :", item_iloc.construction_method)
             print("\t\tdata_reference_index :", item_iloc.data_reference_index)
             print("\t\tbase_offset          :", item_iloc.base_offset)
-            print("\t\textent_count         :", len(item_iloc.item_loc_ext_list))
+            print("\t\textent_count         :",
+                  len(item_iloc.item_loc_ext_list))
             for item_iloc_ext in item_iloc.item_loc_ext_list:
                 print("\t\t\textent_offset :", item_iloc_ext.extent_offset)
                 print("\t\t\textent_length :", item_iloc_ext.extent_length)
                 print("\t\t\textent_index  :", item_iloc_ext.extent_index)
 
-    def get_item_loc(self, item_ID):
+    def get_item_loc(self, item_ID: int) -> Optional[ItemLocation]:
 
         for item_loc in self.item_loc_list:
             if item_loc.item_ID == item_ID:
@@ -150,7 +156,7 @@ class ItemLocationBox(FullBox):
 
         assert 0, 'invalid item_ID {}'.format(item_ID)
 
-    def has_item_id_entry(self, item_ID):
+    def has_item_id_entry(self, item_ID: int) -> bool:
 
         for item_loc in self.item_loc_list:
             if item_loc.item_ID == item_ID:

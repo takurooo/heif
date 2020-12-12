@@ -1,7 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from _typeshed import NoneType
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,15 +28,15 @@ class MediaHeaderBox(FullBox):
 
     def __init__(self):
         super(MediaHeaderBox, self).__init__()
-        self.creation_time = None
-        self.modification_time = None
-        self.timescale = None
-        self.duration = None
-        self.pad = None
+        self.creation_time = 0
+        self.modification_time = 0
+        self.timescale = 0
+        self.duration = 0
+        self.pad = 0
         self.language = []
-        self.pre_defined = None
+        self.pre_defined = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MediaHeaderBox, self).parse(reader)
 
         if self.get_version() == 1:
@@ -53,9 +55,10 @@ class MediaHeaderBox(FullBox):
             self.language.append(reader.readbits(5))
         self.pre_defined = reader.read16()
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MediaHeaderBox, self).print_box()
         print("creation_time     :", self.creation_time)
         print("modification_time :", self.modification_time)

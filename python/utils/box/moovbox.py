@@ -6,6 +6,7 @@ from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.mvhdbox import MovieHeaderBox
 from utils.box.trackbox import TrackBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -33,7 +34,7 @@ class MovieBox(Box):
         self.mvhd = None
         self.trak = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MovieBox, self).parse(reader)
         while not self.read_complete(reader):
             box_size, box_type = boxutils.read_box_header(reader)
@@ -47,7 +48,7 @@ class MovieBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MovieBox, self).print_box()
         if self.mvhd is not None:
             self.mvhd.print_box()

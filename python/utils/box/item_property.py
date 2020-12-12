@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import Box, FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -24,10 +25,10 @@ class ItemProperty(Box):
         super(ItemProperty, self).__init__()
         # self.skip_to_end(f)  # TODO
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemProperty, self).parse(reader)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemProperty, self).print_box()
 
 
@@ -39,10 +40,10 @@ class ItemFullProperty(FullBox):
     def __init__(self):
         super(ItemFullProperty, self).__init__()
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemFullProperty, self).parse(reader)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemFullProperty, self).print_box()
 
 

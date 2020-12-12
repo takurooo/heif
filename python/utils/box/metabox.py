@@ -10,7 +10,7 @@ from utils.box.ilocbox import ItemLocationBox
 from utils.box.iprpbox import ItemPropertiesBox
 from utils.box.irefbox import ItemReferenceBox
 from utils.box.pitmbox import PrimaryItemBox
-
+from utils.file.binaryfilereader import BinaryFileReader
 
 # -----------------------------------
 # define
@@ -43,7 +43,7 @@ class MetaBox(FullBox):
         self.iref = None
         self.iloc = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MetaBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -70,7 +70,7 @@ class MetaBox(FullBox):
             else:
                 reader.seek(box_size, 1)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MetaBox, self).print_box()
 
         if self.hdlr is not None:

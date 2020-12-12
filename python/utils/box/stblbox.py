@@ -9,6 +9,7 @@ from utils.box.stscbox import SampleToChunkBox
 from utils.box.stsdbox import SampleDescriptionBox
 from utils.box.stszbox import SampleSizeBox
 from utils.box.sttsbox import DecodingTimeToSampleBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -42,7 +43,7 @@ class SampleTableBox(Box):
         self.stsz = None
         self.stco = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SampleTableBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -69,9 +70,10 @@ class SampleTableBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SampleTableBox, self).print_box()
         if self.stsd is not None:
             self.stsd.print_box()

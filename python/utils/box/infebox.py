@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -31,14 +32,14 @@ class ItemInfoEntry(FullBox):
         self.item_ID = None
         self.item_protection_index = None
         self.item_name = None
-        self.item_type = None
+        self.item_type = ""
         self.item_uri_type = None
         self.content_type = None
         self.content_encoding = None
         self.extension_type = None
         self.iteminfoext = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemInfoEntry, self).parse(reader)
 
         if self.get_version() == 0 or self.get_version() == 1:
@@ -51,7 +52,8 @@ class ItemInfoEntry(FullBox):
 
             if self.get_version() == 1 and 0 < reader.num_bytes_left():
                 self.extension_type = reader.read32()  # optional
-                self.iteminfoext = ItemInfoExtension(self.extension_type)  # optional
+                self.iteminfoext = ItemInfoExtension(
+                    self.extension_type)  # optional
 
         if self.get_version() >= 2:
             if self.get_version() == 2:
@@ -60,7 +62,7 @@ class ItemInfoEntry(FullBox):
                 self.item_ID = reader.read32()
 
             self.item_protection_index = reader.read16()
-            self.item_type = reader.read32(decode=True)
+            self.item_type = reader.read_str32()
 
             self.item_name = reader.read_null_terminated()
 
@@ -71,7 +73,7 @@ class ItemInfoEntry(FullBox):
             elif self.item_type == 'uri ':
                 self.item_uri_type = reader.read_null_terminated()
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemInfoEntry, self).print_box()
         print("item_ID               :", self.item_ID)
         print("item_protection_index :", self.item_protection_index)

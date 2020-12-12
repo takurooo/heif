@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,10 +27,10 @@ class ChunkOffsetBox(FullBox):
 
     def __init__(self):
         super(ChunkOffsetBox, self).__init__()
-        self.entry_count = None
+        self.entry_count = 0
         self.chunk_offset = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ChunkOffsetBox, self).parse(reader)
 
         self.entry_count = reader.read32()
@@ -42,9 +43,10 @@ class ChunkOffsetBox(FullBox):
             for i in range(self.entry_count):
                 self.chunk_offset.append(reader.read64())
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ChunkOffsetBox, self).print_box()
         print("entry_count  :", self.entry_count)
         print("chunk_offset :", self.chunk_offset)

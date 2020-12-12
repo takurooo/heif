@@ -1,7 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import List
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -17,7 +19,7 @@ from utils.box.basebox import FullBox
 # -----------------------------------
 class Association:
     def __init__(self):
-        self.item_ID = None
+        self.item_ID = 0
         self.essential = []
         self.property_index = []
 
@@ -37,7 +39,7 @@ class ItemPropertyAssociation(FullBox):
         # self.property_index = None
         self.association_list = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemPropertyAssociation, self).parse(reader)
 
         self.entry_cout = reader.read32()
@@ -72,12 +74,13 @@ class ItemPropertyAssociation(FullBox):
                     association.essential.append((tmp & 0x80) >> 7)
                     association.property_index.append(tmp & 0x7f)
             self.association_list.append(association)
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_item_property_association(self):
+    def get_item_property_association(self) -> List[Association]:
         return self.association_list
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemPropertyAssociation, self).print_box()
         print("entry_cout :", self.entry_cout)
         print("association_count :", len(self.association_list))

@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -18,10 +19,10 @@ from utils.box.basebox import FullBox
 class EditListEntry:
 
     def __init__(self):
-        self.segment_duration = None
-        self.media_time = None
-        self.media_rate_integer = None
-        self.media_rate_fraction = None
+        self.segment_duration = 0
+        self.media_time = 0
+        self.media_rate_integer = 0
+        self.media_rate_fraction = 0
 
 
 class EditListBox(FullBox):
@@ -35,10 +36,10 @@ class EditListBox(FullBox):
 
     def __init__(self):
         super(EditListBox, self).__init__()
-        self.entry_count = None
-        self.entries = None
+        self.entry_count = 0
+        self.entries = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(EditListBox, self).parse(reader)
 
         self.entry_count = reader.read32()
@@ -57,9 +58,10 @@ class EditListBox(FullBox):
 
             self.entries.append(elst_entry)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(EditListBox, self).print_box()
 
         for i, entry in enumerate(self.entries):

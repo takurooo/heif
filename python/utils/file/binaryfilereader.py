@@ -7,7 +7,7 @@ import struct
 # -----------------------------------
 # define
 # -----------------------------------
-BIG_LITTLE = {'little':'<', 'big':'>'}
+BIG_LITTLE = {'little': '<', 'big': '>'}
 
 
 # -----------------------------------
@@ -17,7 +17,7 @@ BIG_LITTLE = {'little':'<', 'big':'>'}
 
 class BinaryFileReader:
 
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         self.file_path = file_path
         self.f = open(file_path, 'rb')
         self.file_size = os.path.getsize(file_path)
@@ -29,49 +29,38 @@ class BinaryFileReader:
 
         self.byteorder = 'big'
 
-    def set_byteorder(self, byteorder):
+    def set_byteorder(self, byteorder: str) -> None:
         self.byteorder = byteorder
 
-    def close(self):
+    def close(self) -> None:
         if self.f:
             self.f.close()
 
-    def num_bytes_left(self):
+    def num_bytes_left(self) -> int:
         return self.file_size - (self.f.tell() - self.start_fp)
 
-    def seek_to_end(self):
+    def seek_to_end(self) -> None:
         self.seek(self.file_size)
 
-    def seek(self, offset, whence=0):
+    def seek(self, offset: int, whence: int = 0) -> None:
         self.f.seek(offset, whence)
 
-    def tell(self):
+    def tell(self) -> int:
         return self.f.tell()
 
-    def read_raw(self, size):
+    def read_raw(self, size: int) -> bytes:
         return self.f.read(size)
 
-    def read8(self, signed=False, decode=False):
-        if decode:
-            return self.f.read(1).decode()
-        else:
-            if signed:
-                format_char = 'b'
-            else:
-                format_char = 'B'
-            return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(1))[0]
+    def read_str8(self) -> str:
+        return self.f.read(1).decode()
 
-    def read16(self, signed=False, decode=False):
-        if decode:
-            return self.f.read(2).decode()
-        else:
-            if signed:
-                format_char = 'h'
-            else:
-                format_char = 'H'
-            return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(2))[0]
+    def read_str16(self) -> str:
+        s = self.f.read(2).decode()
+        if self.byteorder == 'little':
+            s = s[::-1]
+        return s
 
-    def read24(self, signed=False, decode=False):
+    def read_str24(self) -> str:
         filler = 0
         filler = filler.to_bytes(1, byteorder='big', signed=True)
         a = self.f.read(1)
@@ -84,61 +73,94 @@ class BinaryFileReader:
         else:
             raise ValueError('Invalid byteorder {}'.format(self.byteorder))
 
-        if decode:
-            return bin24.decode()
-        else:
-            bin32 = bin24 + filler  # to 32bit
-            if signed:
-                format_char = 'l'
-            else:
-                format_char = 'L'
-            ret24 = struct.unpack(BIG_LITTLE[self.byteorder] + format_char, bin32)[0] >> 8
-            return ret24
+        return bin24.decode()
 
-    def read32(self, signed=False, decode=False):
-        if decode:
-            return self.f.read(4).decode()
-        else:
-            if signed:
-                format_char = 'l'
-            else:
-                format_char = 'L'
-            return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(4))[0]
+    def read_str32(self) -> str:
+        s = self.f.read(4).decode()
+        if self.byteorder == 'little':
+            s = s[::-1]
+        return s
 
-    def read64(self, signed=False, decode=False):
-        if decode:
-            return self.f.read(8).decode()
-        else:
-            if signed:
-                format_char = 'q'
-            else:
-                format_char = 'Q'
-            return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(8))[0]
+    def read_str64(self) -> str:
+        s = self.f.read(8).decode()
+        if self.byteorder == 'little':
+            s = s[::-1]
+        return s
 
-    def readn(self, size_bits, signed=False, decode=False):
+    def read8(self, signed: bool = False) -> int:
+        if signed:
+            format_char = 'b'
+        else:
+            format_char = 'B'
+        return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(1))[0]
+
+    def read16(self, signed: bool = False) -> int:
+        if signed:
+            format_char = 'h'
+        else:
+            format_char = 'H'
+        return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(2))[0]
+
+    def read24(self, signed: bool = False) -> int:
+        filler = 0
+        filler = filler.to_bytes(1, byteorder='big', signed=True)
+        a = self.f.read(1)
+        b = self.f.read(1)
+        c = self.f.read(1)
+        if self.byteorder == 'big':
+            bin24 = a + b + c
+        elif self.byteorder == 'little':
+            bin24 = c + b + a
+        else:
+            raise ValueError('Invalid byteorder {}'.format(self.byteorder))
+
+        bin32 = bin24 + filler  # to 32bit
+        if signed:
+            format_char = 'l'
+        else:
+            format_char = 'L'
+        ret24 = struct.unpack(
+            BIG_LITTLE[self.byteorder] + format_char, bin32)[0] >> 8
+        return ret24
+
+    def read32(self, signed: bool = False) -> int:
+        if signed:
+            format_char = 'l'
+        else:
+            format_char = 'L'
+        return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(4))[0]
+
+    def read64(self, signed: bool = False) -> int:
+        if signed:
+            format_char = 'q'
+        else:
+            format_char = 'Q'
+        return struct.unpack(BIG_LITTLE[self.byteorder] + format_char, self.f.read(8))[0]
+
+    def readn(self, size_bits: int, signed: bool = False) -> int:
 
         if size_bits == 0:
             return 0
 
         if size_bits == 64:
-            data = self.read64(signed, decode)
+            data = self.read64(signed)
         elif size_bits == 32:
-            data = self.read32(signed, decode)
+            data = self.read32(signed)
         elif size_bits == 24:
-            data = self.read24(signed, decode)
+            data = self.read24(signed)
         elif size_bits == 16:
-            data = self.read16(signed, decode)
+            data = self.read16(signed)
         elif size_bits == 8:
-            data = self.read8(signed, decode)
+            data = self.read8(signed)
         else:
             raise ValueError()
 
         return data
 
-    def is_byte_aligned(self):
+    def is_byte_aligned(self) -> bool:
         return self.num_bits_left == 0
 
-    def readbits(self, len):
+    def readbits(self, len: int) -> int:
         # big endian only
 
         if len == 0:
@@ -156,25 +178,25 @@ class BinaryFileReader:
 
         else:
             read_bits = self.read8()
-            self.bit_buffer = (self.bit_buffer << self.num_bits_left) | read_bits
+            self.bit_buffer = (self.bit_buffer <<
+                               self.num_bits_left) | read_bits
             self.num_bits_left += 8
             return_bits = self.bit_buffer >> (self.num_bits_left - len)
-            self.bit_buffer = ((self.bit_buffer << (8 - (self.num_bits_left - len))) & 0xFF)
+            self.bit_buffer = ((self.bit_buffer << (
+                8 - (self.num_bits_left - len))) & 0xFF)
             self.num_bits_left -= len
 
         return return_bits
 
-    def read_null_terminated(self):
+    def read_null_terminated(self) -> str:
         null = b'\x00'
         s = ''
         while True:
-            c = self.read8('big', decode=True)
+            c = self.read_str8()
             s += c
             if c.encode() == null:
                 break
         return s
-
-
 
 
 # -----------------------------------

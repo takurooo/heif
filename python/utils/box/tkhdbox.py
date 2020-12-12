@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -28,18 +29,18 @@ class TrackHeaderBox(FullBox):
 
     def __init__(self):
         super(TrackHeaderBox, self).__init__()
-        self.creation_time = None
-        self.modification_time = None
-        self.track_ID = None
-        self.duration = None
-        self.layer = None
-        self.alternate_group = None
-        self.volume = None
-        self.matrix = None
-        self.width = None
-        self.height = None
+        self.creation_time = 0
+        self.modification_time = 0
+        self.track_ID = 0
+        self.duration = 0
+        self.layer = 0
+        self.alternate_group = 0
+        self.volume = 0
+        self.matrix = []
+        self.width = 0
+        self.height = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(TrackHeaderBox, self).parse(reader)
 
         if self.get_version() == 1:
@@ -71,9 +72,10 @@ class TrackHeaderBox(FullBox):
         self.width = reader.read32()
         self.height = reader.read32()
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(TrackHeaderBox, self).print_box()
         print("creation_time     :", self.creation_time)
         print("modification_time :", self.modification_time)

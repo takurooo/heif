@@ -5,6 +5,7 @@ from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.ipcobox import ItemPropertyContainerBox
 from utils.box.ipmabox import ItemPropertyAssociation
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -57,11 +58,11 @@ class ItemPropertiesBox(Box):
 
     def __init__(self):
         super(ItemPropertiesBox, self).__init__()
-        self.property_container = None
+        # self.property_container = None
         self.ipco = None
         self.ipma = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemPropertiesBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -76,9 +77,10 @@ class ItemPropertiesBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemPropertiesBox, self).print_box()
         if self.ipco is not None:
             self.ipco.print_box()

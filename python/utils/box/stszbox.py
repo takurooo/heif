@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,11 +27,11 @@ class SampleSizeBox(FullBox):
 
     def __init__(self):
         super(SampleSizeBox, self).__init__()
-        self.sample_size = None
-        self.sample_count = None
+        self.sample_size = 0
+        self.sample_count = 0
         self.entry_size = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SampleSizeBox, self).parse(reader)
 
         self.sample_size = reader.read32()
@@ -40,15 +41,16 @@ class SampleSizeBox(FullBox):
             for i in range(self.sample_count):
                 self.entry_size.append(reader.read32())
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_sample_size(self, idx):
+    def get_sample_size(self, idx: int) -> int:
         if self.sample_size == 0:
             return self.entry_size[idx]
         else:
             return self.sample_size
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SampleSizeBox, self).print_box()
         print("sample_size  :", self.sample_size)
         print("sample_count :", self.sample_count)

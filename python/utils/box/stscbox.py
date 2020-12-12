@@ -1,7 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import List
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,12 +28,12 @@ class SampleToChunkBox(FullBox):
 
     def __init__(self):
         super(SampleToChunkBox, self).__init__()
-        self.entry_count = None
+        self.entry_count = 0
         self.first_chunk = []
         self.samples_per_chunk = []
         self.sample_description_index = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SampleToChunkBox, self).parse(reader)
 
         self.entry_count = reader.read32()
@@ -41,16 +43,17 @@ class SampleToChunkBox(FullBox):
             self.samples_per_chunk.append(reader.read32())
             self.sample_description_index.append(reader.read32())
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SampleToChunkBox, self).print_box()
         print("entry_count              :", self.entry_count)
         print("first_chunk              :", self.first_chunk)
         print("samples_per_chunk        :", self.samples_per_chunk)
         print("sample_description_index :", self.sample_description_index)
 
-    def get_samples_per_chunk(self, chunk_idx):
+    def get_samples_per_chunk(self, chunk_idx) -> int:
         chunk_no = chunk_idx + 1
         for i in range(self.entry_count):
             if chunk_no < self.first_chunk[i]:

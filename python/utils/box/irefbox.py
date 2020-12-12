@@ -3,6 +3,7 @@
 # -----------------------------------
 from utils.box import boxutils
 from utils.box.basebox import Box, FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -21,11 +22,11 @@ from utils.box.basebox import Box, FullBox
 class SingleItemTypeReferenceBox(Box):
     def __init__(self):
         super(SingleItemTypeReferenceBox, self).__init__()
-        self.from_item_ID = None
-        self.reference_count = None
-        self.to_item_ID = None
+        self.from_item_ID = 0
+        self.reference_count = 0
+        self.to_item_ID = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SingleItemTypeReferenceBox, self).parse(reader)
 
         self.from_item_ID = reader.read16()
@@ -34,7 +35,7 @@ class SingleItemTypeReferenceBox(Box):
         for _ in range(self.reference_count):
             self.to_item_ID.append(reader.read16())
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SingleItemTypeReferenceBox, self).print_box()
         print("from_item_ID    :", self.from_item_ID)
         print("reference_count :", self.reference_count)
@@ -48,7 +49,7 @@ class SingleItemTypeReferenceBoxLarge(Box):
         self.reference_count = None
         self.to_item_ID = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(SingleItemTypeReferenceBoxLarge, self).parse(reader)
 
         self.from_item_ID = reader.read32()
@@ -57,7 +58,7 @@ class SingleItemTypeReferenceBoxLarge(Box):
         for _ in range(self.reference_count):
             self.to_item_ID.append(reader.read32())
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(SingleItemTypeReferenceBoxLarge, self).print_box()
         print("from_item_ID    :", self.from_item_ID)
         print("reference_count :", self.reference_count)
@@ -77,7 +78,7 @@ class ItemReferenceBox(FullBox):
         super(ItemReferenceBox, self).__init__()
         self.item_reference_list = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemReferenceBox, self).parse(reader)
 
         self.item_reference_list = []
@@ -93,7 +94,7 @@ class ItemReferenceBox(FullBox):
             item_ref_box.parse(reader)
             self.item_reference_list.append(item_ref_box)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemReferenceBox, self).print_box()
         for item_reference in self.item_reference_list:
             item_reference.print_box()

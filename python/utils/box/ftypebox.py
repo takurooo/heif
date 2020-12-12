@@ -1,7 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import List
 from utils.box.basebox import Box
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -26,31 +28,32 @@ class FileTypeBox(Box):
 
     def __init__(self):
         super(FileTypeBox, self).__init__()
-        self.major_brand = None
-        self.minor_version = None
-        self.compatible_brands = None
+        self.major_brand = ""
+        self.minor_version = 0
+        self.compatible_brands = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(FileTypeBox, self).parse(reader)
-        self.major_brand = reader.read32(decode=True)
-        self.minor_version = reader.read32(decode=False)
+        self.major_brand = reader.read_str32()
+        self.minor_version = reader.read32()
 
         self.compatible_brands = []
         while not self.read_complete(reader):
-            self.compatible_brands.append(reader.read32(decode=True))
+            self.compatible_brands.append(reader.read_str32())
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_major_brand(self):
+    def get_major_brand(self) -> str:
         return self.major_brand
 
-    def get_minor_version(self):
+    def get_minor_version(self) -> int:
         return self.minor_version
 
-    def get_compatible_brands(self):
+    def get_compatible_brands(self) -> List[str]:
         return self.compatible_brands
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(FileTypeBox, self).print_box()
         print("major_brand       :", self.major_brand)
         print("minor_version     :", self.minor_version)

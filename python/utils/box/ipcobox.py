@@ -1,6 +1,7 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import List
 from utils.box import boxutils
 from utils.box.basebox import Box
 from utils.box.colrbox import ColourInformationBox
@@ -8,6 +9,9 @@ from utils.box.hvccbox import HEVCConfigurationBox
 from utils.box.irotbox import ItemRotation
 from utils.box.ispebox import ImageSpatialExtentsProperty
 from utils.box.pixibox import PixelInformationProperty
+from utils.box.item_property import ItemProperty
+
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -29,9 +33,9 @@ class ItemPropertyContainerBox(Box):
 
     def __init__(self):
         super(ItemPropertyContainerBox, self).__init__()
-        self.item_properties = None
+        self.item_properties = []
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ItemPropertyContainerBox, self).parse(reader)
 
         self.item_properties = []
@@ -56,14 +60,15 @@ class ItemPropertyContainerBox(Box):
                 item_property.parse(reader)
                 self.item_properties.append(item_property)
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ItemPropertyContainerBox, self).print_box()
         for item_property in self.item_properties:
             item_property.print_box()
 
-    def get_item_properties(self):
+    def get_item_properties(self) -> List[ItemProperty]:
         return self.item_properties
 
 

@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import Box
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -27,11 +28,11 @@ class MediaDataBox(Box):
     def __init__(self):
         super(MediaDataBox, self).__init__()
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(MediaDataBox, self).parse(reader)
         self.to_box_end(reader)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(MediaDataBox, self).print_box()
 
 

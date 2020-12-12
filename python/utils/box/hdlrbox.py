@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import FullBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -28,26 +29,27 @@ class HandlerReferenceBox(FullBox):
 
     def __init__(self):
         super(HandlerReferenceBox, self).__init__()
-        self.pre_defined = None
-        self.handler_type = None
-        self.name = None
+        self.pre_defined = 0
+        self.handler_type = ""
+        self.name = ""
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(HandlerReferenceBox, self).parse(reader)
 
         self.pre_defined = reader.read32()
-        self.handler_type = reader.read32(decode=True)
+        self.handler_type = reader.read_str32()
         for _ in range(3):
             _ = reader.read32()  # reserved
 
-        self.name = None
+        self.name = ""
         if not self.read_complete(reader):
             self.name = reader.read_null_terminated()
             pass
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(HandlerReferenceBox, self).print_box()
         print("pre_defined  :", self.pre_defined)
         print("handler_type :", self.handler_type)

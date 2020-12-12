@@ -1,7 +1,9 @@
 # -----------------------------------
 # import
 # -----------------------------------
+from typing import Tuple
 from utils.box.item_property import ItemFullProperty
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -23,20 +25,21 @@ class ImageSpatialExtentsProperty(ItemFullProperty):
 
     def __init__(self):
         super(ImageSpatialExtentsProperty, self).__init__()
-        self.image_width = None
-        self.image_height = None
+        self.image_width = 0
+        self.image_height = 0
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ImageSpatialExtentsProperty, self).parse(reader)
 
         self.image_width = reader.read32()
         self.image_height = reader.read32()
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def get_image_width_height(self):
-        return self.image_width, self.image_height
+    def get_image_width_height(self) -> Tuple[int, int]:
+        return (self.image_width, self.image_height)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ImageSpatialExtentsProperty, self).print_box()
         print("image_width  :", self.image_width)
         print("image_height :", self.image_height)

@@ -28,7 +28,7 @@ class BoxReader:
         self.meta = None
         self.mdat = None
 
-    def read_boxes(self, reader):
+    def read_boxes(self, reader: BinaryFileReader) -> None:
         while reader.num_bytes_left():
             box_size, box_type = boxutils.read_box_header(reader)
             # print(box_type)
@@ -45,7 +45,7 @@ class BoxReader:
             else:
                 reader.seek(box_size, 1)
 
-    def print_boxes(self):
+    def print_boxes(self) -> None:
         if self.ftyp is not None:
             self.ftyp.print_box()
         if self.meta is not None:

@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import Box
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -17,8 +18,9 @@ from utils.box.basebox import Box
 # -----------------------------------
 class NalArray:
     def __init__(self):
-        self.array_completeness = None
-        self.NAL_unit_type = None
+        self.array_completeness = 0
+        self.NAL_unit_type = 0
+        self.numNalus = 0
         self.nal_list = []
 
 
@@ -27,24 +29,24 @@ class HEVCDecoderConfigurationRecord:
     ISO/IEC 14496-15
     """
 
-    def __init__(self, reader):
-        self.configurationVersion = None
-        self.genera_profile_space = None
-        self.general_tier_flag = None
-        self.general_profile_idc = None
-        self.general_profile_compatibility_flags = None
-        self.general_constraint_indicator_flags = None
-        self.general_level_idc = None
-        self.min_spatial_segmentation_idc = None
-        self.parallelismType = None
-        self.chroma_format_idc = None
-        self.bit_depth_luma_minus8 = None
-        self.bit_depth_chroma_minus8 = None
-        self.avgFrameRate = None
-        self.constantFrameRate = None
-        self.numTemporalLayers = None
-        self.temporalIdNested = None
-        self.lengthSizeMinus = None
+    def __init__(self, reader: BinaryFileReader):
+        self.configurationVersion = 0
+        self.genera_profile_space = 0
+        self.general_tier_flag = 0
+        self.general_profile_idc = 0
+        self.general_profile_compatibility_flags = 0
+        self.general_constraint_indicator_flags = 0
+        self.general_level_idc = 0
+        self.min_spatial_segmentation_idc = 0
+        self.parallelismType = 0
+        self.chroma_format_idc = 0
+        self.bit_depth_luma_minus8 = 0
+        self.bit_depth_chroma_minus8 = 0
+        self.avgFrameRate = 0
+        self.constantFrameRate = 0
+        self.numTemporalLayers = 0
+        self.temporalIdNested = 0
+        self.lengthSizeMinus = 0
         # self.numOfArrays = None
         # self.nalUnits = None
         # self.array_completeness = None
@@ -54,7 +56,7 @@ class HEVCDecoderConfigurationRecord:
         self.nal_array = []
         self.parse(reader)
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         self.configurationVersion = reader.read8()
         tmp = reader.read8()
         self.genera_profile_space = (tmp & 0xc0) >> 6
@@ -62,11 +64,11 @@ class HEVCDecoderConfigurationRecord:
         self.general_profile_idc = tmp & 0x1f
         self.general_profile_compatibility_flags = reader.read32()
         self.general_constraint_indicator_flags = (reader.read8() << 40) \
-                                                  | (reader.read8() << 32) \
-                                                  | (reader.read8() << 24) \
-                                                  | (reader.read8() << 16) \
-                                                  | (reader.read8() << 8) \
-                                                  | (reader.read8() << 0)
+            | (reader.read8() << 32) \
+            | (reader.read8() << 24) \
+            | (reader.read8() << 16) \
+            | (reader.read8() << 8) \
+            | (reader.read8() << 0)
         self.general_level_idc = reader.read8()
 
         self.min_spatial_segmentation_idc = reader.read16() & 0x0fff
@@ -110,32 +112,49 @@ class HEVCConfigurationBox(Box):
         super(HEVCConfigurationBox, self).__init__()
         self.HEVCConfig = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(HEVCConfigurationBox, self).parse(reader)
 
         self.HEVCConfig = HEVCDecoderConfigurationRecord(reader)
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(HEVCConfigurationBox, self).print_box()
-        print('configurationVersion                : ', self.HEVCConfig.configurationVersion)
-        print('genera_profile_space                : ', self.HEVCConfig.genera_profile_space)
-        print('general_tier_flag                   : ', self.HEVCConfig.general_tier_flag)
-        print('general_profile_idc                 : ', self.HEVCConfig.general_profile_idc)
+        print('configurationVersion                : ',
+              self.HEVCConfig.configurationVersion)
+        print('genera_profile_space                : ',
+              self.HEVCConfig.genera_profile_space)
+        print('general_tier_flag                   : ',
+              self.HEVCConfig.general_tier_flag)
+        print('general_profile_idc                 : ',
+              self.HEVCConfig.general_profile_idc)
         print('general_profile_compatibility_flags : 0x{:X}'.format(
             self.HEVCConfig.general_profile_compatibility_flags))
-        print('general_constraint_indicator_flags  : 0x{:X}'.format(self.HEVCConfig.general_constraint_indicator_flags))
-        print('general_level_idc                   : ', self.HEVCConfig.general_level_idc)
-        print('min_spatial_segmentation_idc        : ', self.HEVCConfig.min_spatial_segmentation_idc)
-        print('parallelismType                     : ', self.HEVCConfig.parallelismType)
-        print('chroma_format_idc                   : ', self.HEVCConfig.chroma_format_idc)
-        print('bit_depth_luma_minus8               : ', self.HEVCConfig.bit_depth_luma_minus8)
-        print('bit_depth_chroma_minus8             : ', self.HEVCConfig.bit_depth_chroma_minus8)
-        print('avgFrameRate                        : ', self.HEVCConfig.avgFrameRate)
-        print('constantFrameRate                   : ', self.HEVCConfig.constantFrameRate)
-        print('numTemporalLayers                   : ', self.HEVCConfig.numTemporalLayers)
-        print('temporalIdNested                    : ', self.HEVCConfig.temporalIdNested)
-        print('lengthSizeMinus                     : ', self.HEVCConfig.lengthSizeMinus)
+        print('general_constraint_indicator_flags  : 0x{:X}'.format(
+            self.HEVCConfig.general_constraint_indicator_flags))
+        print('general_level_idc                   : ',
+              self.HEVCConfig.general_level_idc)
+        print('min_spatial_segmentation_idc        : ',
+              self.HEVCConfig.min_spatial_segmentation_idc)
+        print('parallelismType                     : ',
+              self.HEVCConfig.parallelismType)
+        print('chroma_format_idc                   : ',
+              self.HEVCConfig.chroma_format_idc)
+        print('bit_depth_luma_minus8               : ',
+              self.HEVCConfig.bit_depth_luma_minus8)
+        print('bit_depth_chroma_minus8             : ',
+              self.HEVCConfig.bit_depth_chroma_minus8)
+        print('avgFrameRate                        : ',
+              self.HEVCConfig.avgFrameRate)
+        print('constantFrameRate                   : ',
+              self.HEVCConfig.constantFrameRate)
+        print('numTemporalLayers                   : ',
+              self.HEVCConfig.numTemporalLayers)
+        print('temporalIdNested                    : ',
+              self.HEVCConfig.temporalIdNested)
+        print('lengthSizeMinus                     : ',
+              self.HEVCConfig.lengthSizeMinus)
         print('nalUnits')
         for nal_array in self.HEVCConfig.nal_array:
             print('\tarray_completeness : ', nal_array.array_completeness)

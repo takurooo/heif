@@ -3,7 +3,6 @@
 # -----------------------------------
 import argparse
 import os
-
 from api.heif.heifreader import HeifReader, ItemType
 
 # -----------------------------------
@@ -19,7 +18,8 @@ CUR_PATH = os.path.join(os.path.dirname(__file__))
 
 def get_args():
     parser = argparse.ArgumentParser(description="Parse HEIF file.")
-    parser.add_argument("img_path", type=str, help="path2your_image", default=None)
+    parser.add_argument("img_path", type=str,
+                        help="path2your_image", default=None)
     return parser.parse_args()
 
 

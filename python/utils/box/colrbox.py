@@ -2,6 +2,7 @@
 # import
 # -----------------------------------
 from utils.box.basebox import Box
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -31,10 +32,10 @@ class ColourInformationBox(Box):
         self.matrix_coefficients = None
         self.full_range_flag = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(ColourInformationBox, self).parse(reader)
 
-        self.colour_type = reader.read32(decode=True)
+        self.colour_type = reader.read_str32()
         if self.colour_type == 'nclx':
             self.colour_primaries = reader.read16()
             self.transfer_characteristics = reader.read16()
@@ -46,9 +47,10 @@ class ColourInformationBox(Box):
         elif self.colour_type == 'prof':
             assert 0, 'not support {}'.format(self.colour_type)  # TODO
 
-        assert self.read_complete(reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(
+            reader), '{} num bytes left not 0.'.format(self.type)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(ColourInformationBox, self).print_box()
         print("colour_type :", self.colour_type)
         print("colour_primaries :", self.colour_primaries)

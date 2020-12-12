@@ -6,6 +6,7 @@ from utils.box.basebox import Box
 from utils.box.edtsbox import EditBox
 from utils.box.mdiabox import MediaBox
 from utils.box.tkhdbox import TrackHeaderBox
+from utils.file.binaryfilereader import BinaryFileReader
 
 
 # -----------------------------------
@@ -35,7 +36,7 @@ class TrackBox(Box):
         self.edts = None
         self.mdia = None
 
-    def parse(self, reader):
+    def parse(self, reader: BinaryFileReader) -> None:
         super(TrackBox, self).parse(reader)
 
         while not self.read_complete(reader):
@@ -53,7 +54,7 @@ class TrackBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-    def print_box(self):
+    def print_box(self) -> None:
         super(TrackBox, self).print_box()
         if self.tkhd is not None:
             self.tkhd.print_box()
