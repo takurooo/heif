@@ -55,8 +55,7 @@ class MediaHeaderBox(FullBox):
             self.language.append(reader.readbits(5))
         self.pre_defined = reader.read16()
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(MediaHeaderBox, self).print_box()

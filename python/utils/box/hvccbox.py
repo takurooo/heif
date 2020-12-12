@@ -116,8 +116,7 @@ class HEVCConfigurationBox(Box):
         super(HEVCConfigurationBox, self).parse(reader)
 
         self.HEVCConfig = HEVCDecoderConfigurationRecord(reader)
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(HEVCConfigurationBox, self).print_box()
@@ -129,10 +128,10 @@ class HEVCConfigurationBox(Box):
               self.HEVCConfig.general_tier_flag)
         print('general_profile_idc                 : ',
               self.HEVCConfig.general_profile_idc)
-        print('general_profile_compatibility_flags : 0x{:X}'.format(
-            self.HEVCConfig.general_profile_compatibility_flags))
-        print('general_constraint_indicator_flags  : 0x{:X}'.format(
-            self.HEVCConfig.general_constraint_indicator_flags))
+        print(
+            f'general_profile_compatibility_flags : {self.HEVCConfig.general_profile_compatibility_flags:#x}')
+        print(
+            f'general_constraint_indicator_flags  : {self.HEVCConfig.general_constraint_indicator_flags:#x}')
         print('general_level_idc                   : ',
               self.HEVCConfig.general_level_idc)
         print('min_spatial_segmentation_idc        : ',

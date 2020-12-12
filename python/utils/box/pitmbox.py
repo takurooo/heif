@@ -34,8 +34,7 @@ class PrimaryItemBox(FullBox):
         super(PrimaryItemBox, self).parse(reader)
 
         self.item_ID = reader.read16()
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def get_primary_item_id(self) -> int:
         return self.item_ID

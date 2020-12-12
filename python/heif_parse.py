@@ -3,7 +3,7 @@
 # -----------------------------------
 import argparse
 import os
-from api.heif.heifreader import HeifReader, ItemType
+from api.heif.heifreader import HeifReader
 
 # -----------------------------------
 # define
@@ -16,7 +16,7 @@ CUR_PATH = os.path.join(os.path.dirname(__file__))
 # -----------------------------------
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Parse HEIF file.")
     parser.add_argument("img_path", type=str,
                         help="path2your_image", default=None)
@@ -27,7 +27,7 @@ def get_args():
 # main
 # -----------------------------------
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     img_path = args.img_path
     heif_reader = HeifReader(img_path)
     heif_reader.print_boxes()

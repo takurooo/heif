@@ -37,8 +37,7 @@ class SoundMediaHeaderBox(FullBox):
         self.balance = reader.read16()  # balance = 0
         _ = reader.read16()  # reserved = 0
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(SoundMediaHeaderBox, self).print_box()

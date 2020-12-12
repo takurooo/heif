@@ -127,8 +127,7 @@ class ItemLocationBox(FullBox):
 
             self.item_loc_list.append(item_loc)
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(ItemLocationBox, self).print_box()
@@ -154,7 +153,7 @@ class ItemLocationBox(FullBox):
             if item_loc.item_ID == item_ID:
                 return item_loc
 
-        assert 0, 'invalid item_ID {}'.format(item_ID)
+        assert 0, f'invalid item_ID {item_ID}'
 
     def has_item_id_entry(self, item_ID: int) -> bool:
 

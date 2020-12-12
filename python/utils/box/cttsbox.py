@@ -45,8 +45,7 @@ class CompositionTimeToSample(FullBox):
                 self.sample_count.append(reader.read32())
                 self.sample_offset.append(reader.read32(signed=True))
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(CompositionTimeToSample, self).print_box()

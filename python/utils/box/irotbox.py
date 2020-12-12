@@ -31,8 +31,7 @@ class ItemRotation(ItemProperty):
 
         tmp = reader.read8()
         self.angle = (tmp & 0x3)
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(ItemRotation, self).print_box()

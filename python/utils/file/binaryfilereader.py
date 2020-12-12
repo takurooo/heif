@@ -71,7 +71,7 @@ class BinaryFileReader:
         elif self.byteorder == 'little':
             bin24 = c + b + a
         else:
-            raise ValueError('Invalid byteorder {}'.format(self.byteorder))
+            raise ValueError(f'Invalid byteorder {self.byteorder}')
 
         return bin24.decode()
 
@@ -112,7 +112,7 @@ class BinaryFileReader:
         elif self.byteorder == 'little':
             bin24 = c + b + a
         else:
-            raise ValueError('Invalid byteorder {}'.format(self.byteorder))
+            raise ValueError(f'Invalid byteorder {self.byteorder}')
 
         bin32 = bin24 + filler  # to 32bit
         if signed:

@@ -46,8 +46,7 @@ class HandlerReferenceBox(FullBox):
             self.name = reader.read_null_terminated()
             pass
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(HandlerReferenceBox, self).print_box()

@@ -58,19 +58,14 @@ class EditListBox(FullBox):
 
             self.entries.append(elst_entry)
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(EditListBox, self).print_box()
 
         for i, entry in enumerate(self.entries):
-            print('entry no.{} segment_duration {} media_time {} media_rate_integer {} media_rate_fraction {}'.format(
-                i, entry.segment_duration, entry.media_time, entry.media_rate_integer, entry.media_rate_fraction))
-            # print('segment_duration :', entry.segment_duration)
-            # print('media_time :', entry.media_time)
-            # print('media_rate_integer :', entry.media_rate_integer)
-            # print('media_rate_fraction :', entry.media_rate_fraction)
+            print(f'entry no.{i} segment_duration {entry.segment_duration} media_time {entry.media_time} media_rate_integer {entry.media_rate_integer} media_rate_fraction {entry.media_rate_fraction}'
+
 
 
 # -----------------------------------

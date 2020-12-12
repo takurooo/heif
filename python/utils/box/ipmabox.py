@@ -74,8 +74,7 @@ class ItemPropertyAssociation(FullBox):
                     association.essential.append((tmp & 0x80) >> 7)
                     association.property_index.append(tmp & 0x7f)
             self.association_list.append(association)
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def get_item_property_association(self) -> List[Association]:
         return self.association_list

@@ -195,8 +195,7 @@ class HeifReader:
          """
         iloc = self.box_reader.meta.iloc
         assert iloc is not None, 'iloc not found.'
-        assert iloc.has_item_id_entry(
-            item_id), 'invali item id {}'.format(item_id)
+        assert iloc.has_item_id_entry(item_id), f'invali item id {item_id}'
 
         item_loc = iloc.get_item_loc(item_id)
 
@@ -205,8 +204,7 @@ class HeifReader:
         item_loc_ext_list = item_loc.get_extent_list()
 
         # TODO idat_offset と item_offset は未対応
-        assert construction_method == item_loc.CONSTRUCTION_METHOD_FILE_OFFSET, 'constructionmethod not filetop {}.'.format(
-            construction_method)
+        assert construction_method == item_loc.CONSTRUCTION_METHOD_FILE_OFFSET, f'constructionmethod not filetop {construction_method}'
 
         item_offset_list = []
         item_size_list = []

@@ -15,35 +15,34 @@ CUR_PATH = os.path.join(os.path.dirname(__file__))
 # -----------------------------------
 # function
 # -----------------------------------
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Demux HEIF file.")
-    parser.add_argument("path", type=str, help="path2your_file or dir", default=None)
+    parser.add_argument(
+        "path", type=str, help="path2your_file or dir", default=None)
     return parser.parse_args()
 
 
-def demux(img_path):
+def demux(img_path: str) -> None:
     heif_reader = HeifReader(img_path)
     item_id_list = heif_reader.get_item_id_list()
 
     basename, _ = os.path.splitext(img_path)
 
-    for i, item_id in enumerate(item_id_list):
+    for item_id in item_id_list:
         item_type = heif_reader.get_item_type(item_id)
         if item_type == ItemType.GRID:
             continue
 
-        ext = '.bin'
-        if item_type == ItemType.XMP:
-            ext = '.xml'
+        ext = '.xml' if item_type == ItemType.XMP else '.bin'
 
-        out_path = '{}_item_{}_{}{}'.format(basename, str(item_id), item_type, ext)
+        out_path = f'{basename}_item_{item_id}_{item_type}{ext}'
         with open(out_path, 'wb') as wf:
             item = heif_reader.read_item(item_id)
             wf.write(item)
 
             print()
-            print("item_ID     : {}".format(item_id))
-            print("item_type   : {}".format(item_type))
+            print(f"item_ID     : {item_id}")
+            print(f"item_type   : {item_type}")
             print("save :", out_path)
 
     return
@@ -52,7 +51,7 @@ def demux(img_path):
 # -----------------------------------
 # main
 # -----------------------------------
-def main(args):
+def main(args: argparse.Namespace) -> None:
     in_path = args.path
 
     file_paths = []
@@ -64,9 +63,6 @@ def main(args):
 
     for img_path in file_paths:
         demux(img_path)
-
-    # print("Press any key...", end='')
-    # input()
 
 
 if __name__ == '__main__':

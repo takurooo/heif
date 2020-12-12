@@ -53,8 +53,7 @@ class ItemInformationBox(FullBox):
                 self.item_id_list.append(infe.item_ID)  # 後で使う用
                 self.infe_list.append(infe)
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(ItemInformationBox, self).print_box()

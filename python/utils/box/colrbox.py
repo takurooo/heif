@@ -43,12 +43,11 @@ class ColourInformationBox(Box):
             tmp = reader.read8()
             self.full_range_flag = (tmp & 0x80) >> 7
         elif self.colour_type == 'rICC':
-            assert 0, 'not support {}'.format(self.colour_type)  # TODO
+            assert 0, f'not support {self.colour_type}'  # TODO
         elif self.colour_type == 'prof':
-            assert 0, 'not support {}'.format(self.colour_type)  # TODO
+            assert 0, f'not support {self.colour_type}'  # TODO
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(ColourInformationBox, self).print_box()

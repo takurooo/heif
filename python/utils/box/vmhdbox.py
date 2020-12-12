@@ -39,8 +39,7 @@ class VideoMediaHeaderBox(FullBox):
         for _ in range(3):
             self.opcolor.append(reader.read16())  # {0,0,0}
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(VideoMediaHeaderBox, self).print_box()

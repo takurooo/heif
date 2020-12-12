@@ -54,8 +54,7 @@ class MediaBox(Box):
             else:
                 reader.seek(box_size, 1)
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(MediaBox, self).print_box()

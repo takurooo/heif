@@ -32,8 +32,7 @@ class PixelInformationProperty(ItemFullProperty):
         self.num_channels = reader.read8()
         for i in range(self.num_channels):
             self.bits_per_channel.append(reader.read8())
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(PixelInformationProperty, self).print_box()

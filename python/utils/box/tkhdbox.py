@@ -72,8 +72,7 @@ class TrackHeaderBox(FullBox):
         self.width = reader.read32()
         self.height = reader.read32()
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(TrackHeaderBox, self).print_box()

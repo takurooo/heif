@@ -43,8 +43,7 @@ class SampleToChunkBox(FullBox):
             self.samples_per_chunk.append(reader.read32())
             self.sample_description_index.append(reader.read32())
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(SampleToChunkBox, self).print_box()

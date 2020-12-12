@@ -60,8 +60,7 @@ class ItemPropertyContainerBox(Box):
                 item_property.parse(reader)
                 self.item_properties.append(item_property)
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def print_box(self) -> None:
         super(ItemPropertyContainerBox, self).print_box()

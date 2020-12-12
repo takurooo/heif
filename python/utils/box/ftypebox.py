@@ -41,8 +41,7 @@ class FileTypeBox(Box):
         while not self.read_complete(reader):
             self.compatible_brands.append(reader.read_str32())
 
-        assert self.read_complete(
-            reader), '{} num bytes left not 0.'.format(self.type)
+        assert self.read_complete(reader), f'{self.type} num bytes left not 0.'
 
     def get_major_brand(self) -> str:
         return self.major_brand
