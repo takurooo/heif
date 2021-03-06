@@ -3,13 +3,12 @@
 # -----------------------------------
 import os
 import argparse
-from api.heif.heifreader import HeifReader, ItemType
-from utils.com.listutils import list_from_dir
+import heifpy
+from .listutils import list_from_dir
 
 # -----------------------------------
 # define
 # -----------------------------------
-CUR_PATH = os.path.join(os.path.dirname(__file__))
 
 
 # -----------------------------------
@@ -17,26 +16,25 @@ CUR_PATH = os.path.join(os.path.dirname(__file__))
 # -----------------------------------
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Demux HEIF file.")
-    parser.add_argument(
-        "path", type=str, help="path2your_file or dir", default=None)
+    parser.add_argument("path", type=str, help="path2your_file or dir", default=None)
     return parser.parse_args()
 
 
 def demux(img_path: str) -> None:
-    heif_reader = HeifReader(img_path)
+    heif_reader = heifpy.HeifReader(img_path)
     item_id_list = heif_reader.get_item_id_list()
 
     basename, _ = os.path.splitext(img_path)
 
     for item_id in item_id_list:
         item_type = heif_reader.get_item_type(item_id)
-        if item_type == ItemType.GRID:
+        if item_type == heifpy.ItemType.GRID:
             continue
 
-        ext = '.xml' if item_type == ItemType.XMP else '.bin'
+        ext = ".xml" if item_type == heifpy.ItemType.XMP else ".bin"
 
-        out_path = f'{basename}_item_{item_id}_{item_type}{ext}'
-        with open(out_path, 'wb') as wf:
+        out_path = f"{basename}_item_{item_id}_{item_type}{ext}"
+        with open(out_path, "wb") as wf:
             item = heif_reader.read_item(item_id)
             wf.write(item)
 
@@ -65,5 +63,5 @@ def main(args: argparse.Namespace) -> None:
         demux(img_path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(get_args())
